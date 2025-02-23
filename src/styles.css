@@ -1,0 +1,217 @@
+/* Custom CSS for additional styles not covered by Bootstrap */
+
+:root {
+    --primary-color: #0004ff;
+  }
+  
+  /* General resets and utility classes */
+  body {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    background-color: #fff;
+    font-size: 16px;
+  }
+  
+  a {
+    text-decoration: none !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #2a2a2a;
+  }
+  
+  /* Custom button styles */
+  .border-button a {
+    font-size: 15px;
+    color: var(--primary-color);
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    padding: 10px 30px;
+    border-radius: 10px;
+    transition: all .3s;
+  }
+  
+  .border-button a:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  /* Main banner styles */
+  .main-banner {
+    position: relative;
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)), url('./assets/images/img-study.jpg');
+    background-size: cover;
+    background-position: left top;
+    min-height: 750px;
+  }
+  
+  .main-banner .container {
+    position: absolute;
+    max-width: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  /* Định dạng thêm cho phần nav của Header */
+  .position-relative {
+    position: relative;
+  }
+  
+  .btn-close {
+    cursor: pointer;
+  }
+  
+  .rounded-circle {
+    border-radius: 50%;
+  }
+  
+  .position-absolute {
+    position: absolute;
+  }
+  
+  .bg-white {
+    background-color: white;
+  }
+  
+  .border {
+    border: 1px solid #ddd;
+  }
+  
+  .shadow-sm {
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .list-unstyled {
+    list-style: none;
+  }
+  
+  .btn-link {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    text-align: left;
+    color: #333;
+  }
+  
+  .btn-link:hover {
+    background-color: #f5f5f5;
+    text-decoration: none;
+  }
+  
+  /* Sidebar styles */
+  #sidebar {
+    width: 250px;
+    background-color: #29075e;
+    color: white;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  #sidebar .img-sidebar img {
+    display: block;
+    margin: 20px auto;
+    max-width: 250px;
+  }
+  
+  .sidebar-container .feature {
+    padding: 10px;
+    border-bottom: 1px solid #7a7a7a;
+    display: flex;
+    align-items: center;
+  }
+  
+  .sidebar-container .feature i {
+    margin-right: 10px;
+  }
+  
+  /* Custom form styles */
+  .form-main {
+    background-color: rgba(0, 0, 0, 0.6);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+  }
+  
+  .form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form .form-control {
+    height: 40px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  /* Tùy chỉnh Bảng Ngân hàng câu hỏi */
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .table th,
+  .table td {
+    vertical-align: middle; /* Căn giữa nội dung */
+    word-wrap: break-word; /* Bẻ từ nếu cần thiết */
+  }
+  
+
+  /* Thanh điều hướng trang trong bài thi */
+  .pagination-controls {
+    background-color: #f8f9fa;
+    padding: 10px;
+    box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Đảm bảo chiều dài của thanh điều hướng bằng với Card */
+  }
+  
+  .pagination-controls button {
+    flex: 0 0 auto;
+  }
+  
+  .pagination-controls span {
+    align-self: center;
+  }
+
+  /* Footer styles */
+  .footer-contain {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 20px 0;
+  }
+  
+  .footer-contain .contact-info {
+    margin-bottom: 10px;
+  }
+  
+  .footer-contain .social-media a {
+    color: white;
+    margin-right: 10px;
+    transition: color 0.3s;
+  }
+  
+  .footer-contain .social-media a:hover {
+    color: #f1c40f;
+  }
+  
