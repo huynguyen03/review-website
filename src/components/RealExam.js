@@ -13,13 +13,17 @@ const RealExam = ({ exam, studentId, onBack }) => {
   const [showReviewPage, setShowReviewPage] = useState(false);
   const [finalScore, setFinalScore] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isResultSent, setIsResultSent] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
   const QUESTIONS_PER_PAGE = 4;
 
-  // Fetch danh sách câu hỏi
+  // Fetch câu hỏi từ API
   const fetchQuestions = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost/react_api/fetch_exam_questions.php?exam_id=${exam.exam_id}`);
+      const response = await fetch(
+        `http://localhost/react_api/fetch_exam_questions.php?exam_id=${exam.exam_id}`
+      );
       if (!response.ok) throw new Error(`Lỗi tải câu hỏi: ${response.status}`);
       const data = await response.json();
       setQuestions(data);
@@ -32,15 +36,15 @@ const RealExam = ({ exam, studentId, onBack }) => {
     if (isStarted) fetchQuestions();
   }, [isStarted, fetchQuestions]);
 
-  // Nhận điểm số từ ScoreCalculator
-  const handleScoreCalculated = async (score) => {
-    console.log(`🏆 Điểm số nhận được: ${score}`);
-    setFinalScore(score);
-    await sendExamResult(score); // Gửi điểm lên API sau khi tính xong
+  // Nhận điểm số từ ScoreCalculator (chỉ gọi khi nộp bài)
+  const handleScoreCalculated = (scoreDetails) => {
+    if (finalScore) return; // Nếu đã có điểm rồi, không cần gọi lại
+    console.log("📊 Điểm số cuối cùng:", scoreDetails);
+    setFinalScore(scoreDetails);
   };
 
-  // Gửi điểm lên API
-  const sendExamResult = async (score) => {
+  const sendExamResult = useCallback(async (scoreDetails) => { 
+    if (isResultSent || !scoreDetails) return;
     try {
       const response = await fetch("http://localhost/react_api/submit_exam_result.php", {
         method: "POST",
@@ -48,48 +52,65 @@ const RealExam = ({ exam, studentId, onBack }) => {
         body: JSON.stringify({
           exam_id: exam.exam_id,
           student_id: studentId,
-          score: score,
-          answers: answers, // Lưu đáp án đã chọn
+          score: scoreDetails.totalScore,
+          correct_counts: scoreDetails.correctCounts,
+          total_counts: scoreDetails.totalCounts,
+          percentages: scoreDetails.percentages,
+          answers: answers,
         }),
       });
-
-      const result = await response.json();
-      if (!result.success) {
-        console.error("Lỗi khi lưu điểm:", result.message);
-      } else {
-        console.log("✅ Điểm đã lưu thành công!");
+  
+      const textResponse = await response.text();
+      try {
+        const result = JSON.parse(textResponse);
+        if (result.success) {
+          console.log("✅ Điểm đã lưu thành công!");
+          setIsResultSent(true);
+        } else {
+          console.error("❌ Lỗi khi lưu điểm:", result.message);
+        }
+      } catch (jsonError) {
+        console.error("🚨 API không trả về JSON hợp lệ! Phản hồi từ server:", textResponse);
       }
     } catch (error) {
-      console.error("Lỗi khi gửi kết quả bài thi:", error);
+      console.error("🚨 Lỗi khi gửi kết quả bài thi:", error);
     }
-  };
-
-  // Nộp bài
-  const handleFinalSubmit = () => {
-    setIsStarted(false);
-    setShowResultPage(true);
-    setIsSubmitted(true);
-  };
-
-  // Chuyển sang màn hình xem lại câu trả lời
-  const handleReviewAnswers = () => {
-    setShowReviewPage(true);
-  };
-
-  // Quay lại màn hình kết quả
-  const handleBackToResult = () => {
-    setShowReviewPage(false);
-  };
-
+  }, [isResultSent, exam.exam_id, studentId, answers]); // ✅ Đã sửa
+  
+  // Gửi điểm lên API một lần duy nhất
   useEffect(() => {
-    let timer;
-    if (isStarted && timeLeft > 0) {
-      timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
-    } else if (timeLeft === 0) {
-      handleFinalSubmit();
+    if (finalScore && !isResultSent) {
+      sendExamResult(finalScore);
     }
-    return () => clearInterval(timer);
-  }, [isStarted, timeLeft]);
+  }, [finalScore, isResultSent, sendExamResult]);
+
+  // Xử lý khi nộp bài
+  const handleFinalSubmit = useCallback(() => { 
+    if (isSubmitted) return;
+    console.log("🔴 Nộp bài thi!");
+    setIsStarted(false);
+    setIsSubmitted(true);
+    setShowResultPage(true);
+  }, [isSubmitted]); // ✅ Đã sửa
+  
+
+// Tự động nộp bài khi hết giờ
+useEffect(() => {
+  if (!isStarted || isSubmitted) return;
+  let timer = setInterval(() => {
+    setTimeLeft((prev) => {
+      if (prev <= 1) {
+        handleFinalSubmit();
+        clearInterval(timer);
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+  return () => clearInterval(timer);
+}, [isStarted, isSubmitted, handleFinalSubmit]); // ✅ Đã sửa
+
+
 
   // Ghi lại câu trả lời của học sinh
   const handleAnswerChange = (questionId, selectedOption) => {
@@ -98,7 +119,15 @@ const RealExam = ({ exam, studentId, onBack }) => {
     }
   };
 
-  const currentQuestions = questions.slice((currentPage - 1) * QUESTIONS_PER_PAGE, currentPage * QUESTIONS_PER_PAGE);
+  // Chuyển sang màn hình xem lại câu trả lời
+  const handleReviewAnswers = () => setShowReviewPage(true);
+  const handleBackToResult = () => setShowReviewPage(false);
+
+  // Lọc danh sách câu hỏi theo trang
+  const currentQuestions = questions.slice(
+    (currentPage - 1) * QUESTIONS_PER_PAGE,
+    currentPage * QUESTIONS_PER_PAGE
+  );
 
   return (
     <Container fluid>
@@ -115,15 +144,17 @@ const RealExam = ({ exam, studentId, onBack }) => {
             onBackToHome={onBack}
             onReviewAnswers={handleReviewAnswers}
           />
-          {/* Gọi ScoreCalculator để tính điểm sau khi nộp bài */}
-          <ScoreCalculator
-            answers={answers}
-            questions={questions}
-            examId={exam.exam_id}
-            studentId={studentId}
-            userRole="student"
-            onScoreCalculated={handleScoreCalculated}
-          />
+          {/* Chỉ tính điểm một lần sau khi nộp bài */}
+          {isSubmitted && !finalScore && (
+            <ScoreCalculator
+              answers={answers}
+              questions={questions}
+              examId={exam.exam_id}
+              studentId={studentId}
+              userRole="student"
+              onScoreCalculated={handleScoreCalculated}
+            />
+          )}
         </>
       ) : (
         <Row>
@@ -131,9 +162,15 @@ const RealExam = ({ exam, studentId, onBack }) => {
             {!isStarted ? (
               <Card className="p-4">
                 <h3>{exam.exam_name}</h3>
-                <p><strong>Thời gian:</strong> {exam.time_limit} phút</p>
-                <Button variant="secondary" onClick={onBack}>Quay lại</Button>{" "}
-                <Button variant="primary" onClick={() => setIsStarted(true)}>Bắt đầu</Button>
+                <p>
+                  <strong>Thời gian:</strong> {exam.time_limit} phút
+                </p>
+                <Button variant="secondary" onClick={onBack}>
+                  Quay lại
+                </Button>{" "}
+                <Button variant="primary" onClick={() => setIsStarted(true)}>
+                  Bắt đầu
+                </Button>
               </Card>
             ) : (
               <Card className="p-4">
@@ -177,7 +214,9 @@ const RealExam = ({ exam, studentId, onBack }) => {
                 <h5><strong>{exam.exam_name}</strong></h5>
                 <p>Thời gian còn lại:</p>
                 <h2>{Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}</h2>
-                <Button className="mt-5" variant="danger" onClick={handleFinalSubmit}>Nộp bài</Button>
+                <Button className="mt-5" variant="danger" onClick={handleFinalSubmit}>
+                  Nộp bài
+                </Button>
               </Card>
             </Col>
           )}

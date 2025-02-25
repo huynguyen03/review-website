@@ -1,30 +1,42 @@
 import React from "react";
-import { Container, Card, Button } from "react-bootstrap";
+import { Container, Card, Button, ListGroup } from "react-bootstrap";
 
-const ExamResult = ({ score, analysis, onBackToHome, onReviewAnswers }) => {
-  const defaultStats = { correct: 0, total: 0 };
-  const easyStats = analysis?.easy ?? defaultStats;
-  const mediumStats = analysis?.medium ?? defaultStats;
-  const hardStats = analysis?.hard ?? defaultStats;
+const ExamResult = ({ score, onBackToHome, onReviewAnswers }) => {
+  if (!score) return <p>Đang tải kết quả...</p>;
+
+  // Mapping cấp độ câu hỏi với tên
+  const levelNames = {
+    1: "Biết",
+    2: "Hiểu",
+    3: "Vận dụng",
+    4: "Vận dụng cao",
+  };
 
   return (
     <Container>
       <Card className="p-4 text-center">
         <h3>Kết quả bài thi</h3>
-        <h2>{score !== null ? score.toFixed(2) : 0} / 100</h2>
-        <p>{score >= 50 ? "Bạn đã vượt qua bài thi!" : "Bạn chưa đạt yêu cầu, hãy cố gắng hơn!"}</p>
+        <h2>{score.totalScore.toFixed(2)} / 100</h2>
+        <p>{score.totalScore >= 50 ? "🎉 Bạn đã vượt qua bài thi!" : "❌ Bạn chưa đạt yêu cầu, hãy cố gắng hơn!"}</p>
 
-        <h4>Phân tích theo mức độ khó:</h4>
-        <p><strong>Dễ:</strong> {easyStats.correct}/{easyStats.total} đúng</p>
-        <p><strong>Trung bình:</strong> {mediumStats.correct}/{mediumStats.total} đúng</p>
-        <p><strong>Khó:</strong> {hardStats.correct}/{hardStats.total} đúng</p>
+        <h4>📊 Phân tích kết quả theo cấp độ:</h4>
+        <ListGroup>
+          {[1, 2, 3, 4].map((level) => (
+            <ListGroup.Item key={level}>
+              <strong>{levelNames[level]}:</strong> {score.correctCounts[level]} / {score.totalCounts[level]} 
+              ({score.percentages[level].toFixed(2)}%)
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
 
-        <Button variant="success" className="m-2" onClick={onReviewAnswers}>
-          Xem lại đáp án
-        </Button>
-        <Button variant="primary" className="m-2" onClick={onBackToHome}>
-          Quay lại danh sách bài thi
-        </Button>
+        <div className="mt-4">
+          <Button variant="success" className="m-2" onClick={onReviewAnswers}>
+            🔍 Xem lại đáp án
+          </Button>
+          <Button variant="primary" className="m-2" onClick={onBackToHome}>
+            ↩ Quay lại danh sách bài thi
+          </Button>
+        </div>
       </Card>
     </Container>
   );
