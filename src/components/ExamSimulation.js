@@ -27,6 +27,7 @@ const ExamSimulation = ({ exam, userRole, onBack }) => {
 
       const data = await response.json();
       setQuestions(data);
+      console.log("câu hỏi nhận về khi gọi lấy câu hỏi bài thi: ", data)
     } catch (error) {
       console.error("Lỗi khi tải câu hỏi:", error);
     }
@@ -93,8 +94,8 @@ const ExamSimulation = ({ exam, userRole, onBack }) => {
     return () => clearInterval(timer);
   }, [isStarted, timeLeft, handleFinalSubmit]);
 
-  const handleAnswerChange = (questionId, selectedOption) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: selectedOption }));
+  const handleAnswerChange = (questionId, answer) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
 
   const handleNextPage = () => {
@@ -139,25 +140,42 @@ const ExamSimulation = ({ exam, userRole, onBack }) => {
             ) : (
               <Card className="p-4">
                 <ListGroup>
-                  {currentQuestions.map((q, index) => (
-                    <ListGroup.Item key={q.question_id} className="mb-3 text-start">
-                      <strong>Câu {index + 1}: {q.question_text}</strong>
-                      <div className="mt-2 d-flex flex-column">
-                        {q.answer_options?.map((option, optionIndex) => (
-                          <Button
-                            key={`${q.question_id}-${optionIndex}`}
-                            variant={answers[q.question_id] === option ? "success" : "outline-primary"}
-                            className="mb-2 text-start"
-                            style={{ width: "auto", maxWidth: "300px" }}
-                            onClick={() => handleAnswerChange(q.question_id, option)}
-                          >
-                            {option}
-                          </Button>
-                        ))}
-                      </div>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
+  {currentQuestions.map((q, index) => (
+    <ListGroup.Item key={q.question_id} className="mb-3 text-start">
+      <strong>Câu {index + 1}: {q.question_text}</strong>
+
+      <div className="mt-2 d-flex flex-column">
+        {q.question_type === "multiple_choice" ? (
+          q.answer_options?.map((option, optionIndex) => (
+            <Button
+              key={`${q.question_id}-${optionIndex}`}
+              variant={answers[q.question_id] === option ? "success" : "outline-primary"}
+              className="mb-2 text-start"
+              style={{ width: "auto", maxWidth: "300px" }}
+              onClick={() => handleAnswerChange(q.question_id, option)}
+            >
+              {option}
+            </Button>
+          ))
+        ) : (
+          <div className="mt-2">
+            <label htmlFor={`answer-${q.question_id}`} className="form-label">Đáp án của bạn là:</label>
+            <input
+              type="text"
+              id={`answer-${q.question_id}`}
+              className="form-control"
+              value={answers[q.question_id] || ""}
+              onChange={(e) => handleAnswerChange(q.question_id, e.target.value)}
+              placeholder="Nhập câu trả lời của bạn..."
+              style={{ maxWidth: "300px" }}
+            />
+          </div>
+        )}
+      </div>
+    </ListGroup.Item>
+  ))}
+</ListGroup>
+
                 <div className="pagination-controls mt-3 d-flex justify-content-between align-items-center">
                   <Button
                     variant="secondary"

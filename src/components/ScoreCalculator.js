@@ -1,16 +1,26 @@
 import { useEffect } from "react";
 
 const ScoreCalculator = ({ answers, questions, onScoreCalculated }) => {
+  console.log("Câu hỏi nhân được từ thi thử để tính điểm: ", questions, "câu trả lời", answers)
   useEffect(() => {
     let correctCounts = { 1: 0, 2: 0, 3: 0, 4: 0 };
     let totalCounts = { 1: 0, 2: 0, 3: 0, 4: 0 };
     let totalCorrectAnswers = 0;
 
     questions.forEach((q) => {
-      if (!Array.isArray(q.answer_options) || q.answer_options.length === 0) return;
-      if (q.correct_answer_index === null || q.correct_answer_index < 0 || q.correct_answer_index >= q.answer_options.length) return;
-
-      const correctAnswer = q.answer_options[q.correct_answer_index].trim().toLowerCase();
+      let correctAnswer =  "";
+      // console.log("Là loại câu hỏi:", q.question_type)
+      
+      if (q.question_type == "short_answer" || q.question_type == "code_response") {
+        correctAnswer = q.correct_answer_text.trim().toLowerCase();
+        // console.log("đã lưu lại đáp án cho câu hỏi khác: ", correctAnswer)
+      } else {
+        
+        if (!Array.isArray(q.answer_options) || q.answer_options.length === 0) return;
+        if (q.correct_answer_index === null || q.correct_answer_index < 0 || q.correct_answer_index >= q.answer_options.length) return;
+        correctAnswer = q.answer_options[q.correct_answer_index].trim().toLowerCase();
+        // console.log("là câu hỏi mutible_choice")
+      }
       const selectedAnswer = answers[q.question_id]?.trim().toLowerCase();
       const difficultyLevel = q.difficulty_level || 2; // Mặc định là 2 (Hiểu) nếu không có giá trị
 

@@ -58,6 +58,7 @@ const UploadFileQuestion = ({ teacherId }) => {
         body: formData,
       });
 
+      console.log(response.data)
       const text = await response.text();
 
       let result;

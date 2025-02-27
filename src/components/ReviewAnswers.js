@@ -14,7 +14,7 @@ const ReviewAnswers = ({ questions, answers, onBackToResult }) => {
             console.log("Đáp án đúng",correctAnswer)
 
             // Kiểm tra nếu câu trả lời của người dùng đúng hay sai
-            const isCorrect = userAnswer === correctAnswer;
+            const isCorrect = userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
 
             return (
               <ListGroup.Item

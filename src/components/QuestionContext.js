@@ -4,11 +4,11 @@ const QuestionContext = createContext();
 
 export const QuestionProvider = ({ children }) => {
   const [questions, setQuestions] = useState([]);
-  const [lastFetchedTeacherId, setLastFetchedTeacherId] = useState(null);
 
   // ✅ Dùng useCallback để tối ưu việc gọi API
   const fetchQuestions = useCallback(async (teacherId) => {
     if (!teacherId) return;
+    console.log("Không nhận được ID giáo viên với yêu cầu lấy câu hỏi!!!")
     
     try {
       console.log(`Đang lấy về câu hỏi cho giáo viên có ID: ${teacherId}`);
@@ -18,7 +18,6 @@ export const QuestionProvider = ({ children }) => {
 
       const data = await res.json();
       setQuestions(data);
-      setLastFetchedTeacherId(teacherId);
     } catch (error) {
       console.error("Error fetching questions:", error);
     }

@@ -1,19 +1,35 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useQuestions } from "./QuestionContext";
 import AddQuestionModal from "./AddQuestionModal"; // Component thêm câu hỏi thủ công
+import EditQuestion from "./EditQuestion";
 
 const QuestionBank = ({ teacherId }) => {
   const { questions, fetchQuestions, updateQuestions } = useQuestions(); // Lấy danh sách câu hỏi từ context
   const [selectedQuestions, setSelectedQuestions] = useState([]); // Danh sách các câu hỏi được chọn
   const [showAddModal, setShowAddModal] = useState(false); // Hiển thị modal thêm câu hỏi
+  
+  const location = useLocation();
 
   // Lấy danh sách câu hỏi khi component được mount hoặc khi teacherId thay đổi
+  // useEffect(() => {
+  //   // Chỉ gọi API nếu câu hỏi chưa có trong context
+  //   if (questions.length === 0) {
+  //     fetchQuestions(teacherId); // Lấy câu hỏi từ API
+  //   }
+  // }, [teacherId, questions.length, fetchQuestions]); // Thêm `questions.length` để tránh gọi lại API liên tục
+
   useEffect(() => {
-    // Chỉ gọi API nếu câu hỏi chưa có trong context
-    if (questions.length === 0) {
-      fetchQuestions(teacherId); // Lấy câu hỏi từ API
+    // Kiểm tra nếu đang ở trang question_bank thì gọi API
+    const searchParams = new URLSearchParams(location.search);
+    const activeSection = searchParams.get("section");
+    console.log("check section: ", activeSection)
+
+    if (activeSection === "question_bank") {
+      console.log("Đang foij api lấy câu hỏi...")
+      fetchQuestions(teacherId);
     }
-  }, [teacherId, questions.length, fetchQuestions]); // Thêm `questions.length` để tránh gọi lại API liên tục
+  }, [location.search, teacherId, fetchQuestions]);
 
   // Xử lý chọn/deselect câu hỏi
   const handleSelectQuestion = (questionId) => {
@@ -30,16 +46,16 @@ const QuestionBank = ({ teacherId }) => {
       alert("Vui lòng chọn ít nhất một câu hỏi để xóa.");
       return;
     }
-  
+
     // Hiển thị cảnh báo
     const confirmDelete = window.confirm(
       `Bạn có chắc chắn muốn xóa ${selectedQuestions.length} câu hỏi không?`
     );
-  
+
     if (!confirmDelete) {
       return; // Người dùng chọn hủy
     }
-  
+
     // Gửi yêu cầu xóa
     fetch("http://localhost/react_api/delete_questions.php", {
       method: "POST",
@@ -51,15 +67,33 @@ const QuestionBank = ({ teacherId }) => {
         if (data.status === "success") {
           alert("Xóa thành công.");
           // ✅ Cập nhật danh sách câu hỏi ngay lập tức mà không cần gọi lại API
-      updateQuestions(questions.filter(q => !selectedQuestions.includes(q.question_id)));
+          updateQuestions(questions.filter(q => !selectedQuestions.includes(q.question_id)));
 
-      setSelectedQuestions([]); // Reset danh sách chọn
+          setSelectedQuestions([]); // Reset danh sách chọn
         } else {
           alert("Xóa thất bại.");
         }
       })
       .catch((err) => console.error("Error deleting questions:", err));
   };
+
+  
+  const [editingQuestionId, setEditingQuestionId] = useState(null); // State lưu ID câu hỏi cần chỉnh sửa
+const [showEditModal, setShowEditModal] = useState(false); // Kiểm soát hiển thị modal chỉnh sửa
+
+const handleEditQuestions = () => {
+  if (selectedQuestions.length === 0) {
+    alert("Vui lòng chọn một câu hỏi để chỉnh sửa.");
+    return;
+  }
+  if (selectedQuestions.length > 1) {
+    alert("Chỉ chọn 1 câu hỏi để chỉnh sửa!!!");
+    return;
+  }
+
+  setEditingQuestionId(selectedQuestions[0]); // Lưu ID câu hỏi cần chỉnh sửa
+  setShowEditModal(true); // Mở modal chỉnh sửa
+};
 
   return (
     <div className="mt-4">
@@ -89,10 +123,10 @@ const QuestionBank = ({ teacherId }) => {
                   }}
                 />
               </th>
-              <th style={{ width: "15%" }}>Tên câu hỏi</th>
+              <th style={{ width: "10%" }}>Loại câu hỏi</th>
               <th style={{ width: "25%" }}>Nội dung</th>
               <th style={{ width: "15%" }}>Các đáp án để lựa chọn</th>
-              <th style={{ width: "10%" }}>Đáp án đúng</th>
+              <th style={{ width: "15%" }}>Đáp án đúng</th>
               <th style={{ width: "7%" }}>Độ khó</th>
               <th style={{ width: "10%" }}>Trạng thái</th>
               <th style={{ width: "10%" }}>Ngày cập nhật</th>
@@ -108,34 +142,27 @@ const QuestionBank = ({ teacherId }) => {
                     onChange={() => handleSelectQuestion(question.question_id)}
                   />
                 </td>
-                <td>{question.question_title || "Không có tiêu đề"}</td>
+                <td>{question.question_type}</td>
                 <td>{question.question_text}</td>
                 <td
-  style={{
-    overflowX: 'auto',
-    whiteSpace: 'nowrap',
-    padding: '0',
-    maxWidth: '100%',
-  }}
-  onClick={(e) => e.stopPropagation()} // Chặn sự kiện click ra ngoài nếu cần
->
-  <div className="d-flex">
-    {question.answer_options?.map((option, index) => (
-      <div key={index} className="mr-3 pl-1" style={{ flexShrink: 0 }}>
-       <span class="mx-2">{option}</span>
-      </div>
-    ))}
-  </div>
-</td>
-
-                <td>
-                  {question.correct_answer_index !== null &&
-                  question.answer_options?.[question.correct_answer_index]
-                    ? `${
-                        question.answer_options[question.correct_answer_index]
-                      }`
-                    : "Không xác định"}
+                  style={{
+                    overflowX: 'auto',
+                    whiteSpace: 'nowrap',
+                    padding: '0',
+                    maxWidth: '100%',
+                  }}
+                  onClick={(e) => e.stopPropagation()} // Chặn sự kiện click ra ngoài nếu cần
+                >
+                  <div className="d-flex">
+                    {question.answer_options?.map((option, index) => (
+                      <div key={index} className="mr-3 pl-1" style={{ flexShrink: 0 }}>
+                        <span className="mx-2">{option}</span>
+                      </div>
+                    ))}
+                  </div>
                 </td>
+
+                <td>{question.correct_answer_text}</td>
                 <td>{question.difficulty_level}</td>
                 <td>{question.status}</td>
                 <td>{new Date(question.updated_at).toLocaleDateString()}</td>
@@ -155,14 +182,47 @@ const QuestionBank = ({ teacherId }) => {
         Xóa câu hỏi
       </button>
 
+      <button
+        className="btn btn-warning mt-3"
+        onClick={handleEditQuestions}
+        disabled={selectedQuestions.length === 0} // Vô hiệu hóa nếu không có câu hỏi được chọn
+      >
+        Chỉnh sửa câu hỏi
+      </button>
+
       {showAddModal && (
-        <AddQuestionModal
-          teacherId={teacherId}
-          onClose={() => setShowAddModal(false)} // Đóng modal
-          onSuccess={() => fetchQuestions(teacherId)} // Cập nhật danh sách sau khi thêm thành công
-        />
-      )}
+  <AddQuestionModal
+    teacherId={teacherId} // Đảm bảo truyền đúng teacherId
+    onClose={() => setShowAddModal(false)} // Đóng modal khi hoàn thành
+    onSuccess={() => {
+      fetchQuestions(); // Cập nhật danh sách câu hỏi sau khi thêm mới
+      setShowAddModal(false);
+    }}
+  />
+)}
+
+
+<EditQuestion
+  show={showEditModal}
+  onHide={() => {
+    setShowEditModal(false);
+    setEditingQuestionId(null); // Reset ID sau khi đóng
+  }}
+  questionId={editingQuestionId}
+  teacherId={teacherId}
+  onQuestionUpdated={(updatedQuestion) => {
+    updateQuestions((prevQuestions) =>
+      prevQuestions.map((q) =>
+        q.question_id === updatedQuestion.question_id ? updatedQuestion : q
+      )
+    );
+    setShowEditModal(false);
+    setEditingQuestionId(null); // Reset ID sau khi cập nhật
+  }}
+/>
+
     </div>
+    
   );
 };
 
