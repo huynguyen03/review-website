@@ -6,6 +6,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowsAlt, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 import EditQuestion from "./EditQuestion";  // Import EditQuestion
+import RandomQuestionSelector from "./RandomQuestionSelector";  // Import EditQuestion
+
+
 
 const SortableItem = ({ question, onEdit, onRemove }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: question.question_id });
@@ -47,11 +50,11 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
   const [categories, setCategories] = useState([]); // Lưu danh mục câu hỏi
   const [filteredQuestions, setFilteredQuestions] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [showRandomQuestionsForm, setShowRandomQuestionsForm] = useState(false); // State để điều khiển việc hiển thị form
   const [searchQuery, setSearchQuery] = useState("");
   const [editingQuestionId, setEditingQuestionId] = useState(null);
-  // Thêm state cho số lượng câu hỏi ngẫu nhiên theo mỗi danh mục
-  const [randomQuestions, setRandomQuestions] = useState({});
+  const [isRandomQuestion, setIsrandomQuestion] = useState(false)
+  const [randomQuestionData, setRandomQuestionData] = useState(null); // lưu tạm ma trận đợi gọi tạo bài thi
+
 
 
   useEffect(() => {
@@ -64,8 +67,8 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
 
         const categoriesResponse = await fetch("http://localhost/react_api/get_categories.php"); // Giả sử có endpoint để lấy danh mục
         const categoriesData = await categoriesResponse.json();
-        console.log("Danh mục: ", )
-        setCategories(categoriesData, categoriesData);
+        setCategories(categoriesData);
+        // console.log("Danh mục: ", categories)
       } catch (error) {
         console.error("Error fetching questions:", error);
       }
@@ -80,24 +83,29 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
     );
     setFilteredQuestions(filtered);
   };
-  const handleRandomQuestionChange = (categoryId, count) => {
-    setRandomQuestions((prev) => ({
-      ...prev,
-      [categoryId]: count,
-    }));
+  // const handleRandomQuestionChange = (categoryId, count) => {
+  //   setRandomQuestions((prev) => ({
+  //     ...prev,
+  //     [categoryId]: count,
+  //   }));
+  // };
+  const handleReceiveQuestionMatrix = (matrix) => {
+    setRandomQuestionData(matrix); // Chỉ lưu dữ liệu, chưa gọi handleCreateQuiz
   };
-
-  const handleAddRandomQuestions = async () => {
-    if (!quizName || !timeLimit || Object.keys(randomQuestions).length === 0) {
-      alert("Vui lòng nhập đầy đủ thông tin và chọn ít nhất một danh mục.");
+  
+  const handleCreateQuiz = async (matrix) => {
+    console.log(matrix)
+    if (!quizName || !timeLimit || (selectedQuestions.length === 0 && isRandomQuestion === false)) {
+      alert("Vui lòng nhập đầy đủ thông tin và chọn ít nhất một câu hỏi.");
       return;
     }
-
     const payload = {
       quiz_name: quizName,
       time_limit: timeLimit,
-      teacher_id: teacherId,
-      random_questions: randomQuestions,
+      teacher_id: localStorage.getItem("user_id"), // Lưu ID người tạo bài thi
+      selected_questions: selectedQuestions,
+      questions_matrix: matrix,
+      is_Random_Question: isRandomQuestion
     };
 
     try {
@@ -115,7 +123,7 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
         setQuizName(""); 
         setTimeLimit(""); 
         setSelectedQuestions([]);
-        onQuizCreated();
+        onQuizCreated(); // Gọi hàm cập nhật danh sách bài thi
       } else {
         alert("Lỗi: " + result.message);
       }
@@ -123,7 +131,7 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
       console.error("Lỗi khi gửi dữ liệu:", error);
       alert("Đã xảy ra lỗi khi lưu bài thi.");
     }
-  };
+  }
 
   const handleQuestionSelect = (question) => {
     setSelectedQuestions((prev) => {
@@ -210,37 +218,25 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
 
       <Row className="mb-3">
         <Col>
-          <Button variant="secondary" onClick={() => setShowModal(true)}>
+          <Button variant="secondary" onClick={() => {setShowModal(true); setIsrandomQuestion(false)}}>
             Thêm câu hỏi từ ngân hành câu hỏi
           </Button>
-          <Button variant="secondary" className="mx-5" onClick={() => setShowRandomQuestionsForm(!showRandomQuestionsForm)}>
+          <Button 
+            variant="secondary" 
+            className="mx-5" 
+            onClick={() => {setShowModal(false); setIsrandomQuestion(true); setSelectedQuestions([])}}>
             Thêm câu hỏi ngẩu nhiên theo ma trận
           </Button>
         </Col>
       </Row>
       {/* Hiển thị form khi nút "Thêm câu hỏi ngẫu nhiên" được nhấn */}
-      {showRandomQuestionsForm && (
-          <Row className="mb-3">
-            <Col>
-              <h5>Thêm câu hỏi ngẫu nhiên</h5>
-              {categories.map((category) => (
-                <Form.Group key={category.category_id} controlId={`randomCount${category.category_id}`}>
-                  <Form.Label>{category.category_name}</Form.Label>
-                  <Form.Control
-                    type="number"
-                    value={randomQuestions[category.category_id] || 0}
-                    min="0"
-                    onChange={(e) => handleRandomQuestionChange(category.category_id, e.target.value)}
-                    placeholder={`Nhập số câu hỏi từ ${category.category_name}`}
-                  />
-                </Form.Group>
-              ))}
-              <Button variant="primary" onClick={handleAddRandomQuestions}>
-                Thêm câu hỏi ngẫu nhiên
-              </Button>
-            </Col>
-          </Row>
-        )}
+      {/* Hiển thị giao diện khi nút được nhấn */}
+      {isRandomQuestion && ( 
+        <RandomQuestionSelector
+          categories={categories}
+          onAddRandomQuestions={handleReceiveQuestionMatrix}
+        />
+      )}
 
       {/* Modal Ngân hàng câu hỏi */}
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
@@ -320,43 +316,7 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
 <Button 
   variant="success" 
   className="mt-3"
-  onClick={async () => {
-    if (!quizName || !timeLimit || selectedQuestions.length === 0) {
-      alert("Vui lòng nhập đầy đủ thông tin và chọn ít nhất một câu hỏi.");
-      return;
-    }
-
-    const payload = {
-      quiz_name: quizName,
-      time_limit: timeLimit,
-      teacher_id: localStorage.getItem("user_id"), // Lưu ID người tạo bài thi
-      selected_questions: selectedQuestions
-    };
-
-    try {
-      const response = await fetch("http://localhost/react_api/create_quiz.php", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        alert("Bài thi đã được lưu thành công!");
-        setQuizName(""); 
-        setTimeLimit(""); 
-        setSelectedQuestions([]);
-        onQuizCreated(); // Gọi hàm cập nhật danh sách bài thi
-      } else {
-        alert("Lỗi: " + result.message);
-      }
-    } catch (error) {
-      console.error("Lỗi khi gửi dữ liệu:", error);
-      alert("Đã xảy ra lỗi khi lưu bài thi.");
-    }
-  }}
+  onClick={() => handleCreateQuiz(randomQuestionData)}
 >
   Lưu và tạo bài thi
 </Button>

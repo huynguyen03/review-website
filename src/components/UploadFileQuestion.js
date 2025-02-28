@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useQuestions } from "./QuestionContext";
+import ModalAddCategory from "./ModalAddCategory";
+
 
 const UploadFileQuestion = ({ teacherId }) => {
   const [file, setFile] = useState(null);
@@ -7,24 +9,23 @@ const UploadFileQuestion = ({ teacherId }) => {
   const { fetchQuestions } = useQuestions(); // Lấy hàm fetchQuestions từ context
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("1");
-  const [newCategory, setNewCategory] = useState(""); // Tên danh mục mới
   const [showModal, setShowModal] = useState(false); // Điều khiển modal
   const [loading, setLoading] = useState(false); // Kiểm soát trạng thái tải lên
 
   // 🔹 Fetch danh mục khi component mount
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("http://localhost/react_api/get_categories.php");
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-        const data = await res.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
     fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("http://localhost/react_api/get_categories.php");
+      const data = await response.json();
+      setCategories(data); // Cập nhật danh mục
+    } catch (error) {
+      console.error("Lỗi khi lấy danh mục:", error);
+    }
+  };
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -89,31 +90,31 @@ const UploadFileQuestion = ({ teacherId }) => {
     }
   };
 
-  // 🔹 Xử lý thêm danh mục mới
-  const handleAddCategory = async () => {
-    if (!newCategory.trim()) {
+  const handleAddCategory = async (newCategory) => {
+    console.log("Danh mục mới gửi lên:", newCategory);
+  
+    // Kiểm tra dữ liệu hợp lệ
+    if (!newCategory || !newCategory.category_name.trim()) {
       alert("Tên danh mục không được để trống!");
       return;
     }
-
+  
     try {
       const response = await fetch("http://localhost/react_api/add_category.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category_name: newCategory }),
+        body: JSON.stringify({
+          category_name: newCategory.category_name,  // Gửi tên danh mục
+          parent_id: newCategory.parent_id || null,  // Nếu không có danh mục cha, gửi null
+        }),
       });
+  
       const result = await response.json();
-
+  
       if (result.status === "success") {
         alert(result.message);
-        setNewCategory(""); // Reset input
         setShowModal(false); // Đóng modal
-
-        // Cập nhật danh sách danh mục ngay sau khi thêm
-        const res = await fetch("http://localhost/react_api/get_categories.php");
-        if (!res.ok) throw new Error("Không thể tải danh mục mới");
-        const data = await res.json();
-        setCategories(data);
+        fetchCategories(); // Cập nhật danh sách danh mục
       } else {
         alert(result.message);
       }
@@ -122,6 +123,7 @@ const UploadFileQuestion = ({ teacherId }) => {
       alert("Thêm danh mục thất bại!");
     }
   };
+  
 
   return (
     <div className="container mt-2" style={{ maxWidth: "100%" }}>
@@ -146,36 +148,13 @@ const UploadFileQuestion = ({ teacherId }) => {
         </button>
       </div>
 
-      {/* Modal thêm danh mục */}
-      {showModal && (
-        <div className="modal d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Thêm danh mục mới</h5>
-                <button className="btn-close" onClick={() => setShowModal(false)}></button>
-              </div>
-              <div className="modal-body">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Tên danh mục"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                />
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
-                  Hủy
-                </button>
-                <button className="btn btn-primary" onClick={handleAddCategory}>
-                  Thêm
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Hiển thị Modal */}
+      <ModalAddCategory
+        showModal={showModal}
+        setShowModal={setShowModal}
+        categories={categories} // Truyền danh mục cha vào modal
+        onAddCategory={handleAddCategory} // Hàm xử lý khi thêm danh mục mới
+      />
 
       {/* Input file */}
       <input
