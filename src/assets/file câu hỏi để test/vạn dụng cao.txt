@@ -1,0 +1,14 @@
+Câu hỏi: Viết một function PHP kiểm tra số nguyên tố.
+Loại: code_response
+Đáp án: function isPrime($n) { /* logic */ }
+Mức độ: 4
+
+Câu hỏi: Hãy thiết kế một thuật toán để sắp xếp một danh sách số nguyên theo thứ tự tăng dần.
+Loại: code_response
+Đáp án: function quickSort($arr) { /* logic */ }
+Mức độ: 4
+
+Câu hỏi: Giải thích tại sao nước biển có màu xanh?
+Loại: short_answer
+Đáp án: Do sự tán xạ của ánh sáng xanh nhiều hơn các màu khác trong phổ ánh sáng mặt trời.
+Mức độ: 4

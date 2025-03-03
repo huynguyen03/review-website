@@ -1,0 +1,18 @@
+Câu hỏi: Đâu là thủ đô của Pháp?
+Loại: multiple_choice
+A. London
+B. Paris
+C. Berlin
+D. Rome
+Đáp án: Paris
+Mức độ: 3
+
+Câu hỏi: Chọn số tiếp theo trong dãy số: 2, 4, 8, 16, ...?
+Loại: short_answer
+Đáp án: 32
+Mức độ: 3
+
+Câu hỏi: Công thức tính diện tích hình tròn là gì?
+Loại: short_answer
+Đáp án: S = πr²
+Mức độ: 3

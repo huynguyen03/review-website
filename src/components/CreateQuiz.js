@@ -218,12 +218,16 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
 
       <Row className="mb-3">
         <Col>
-          <Button variant="secondary" onClick={() => {setShowModal(true); setIsrandomQuestion(false)}}>
+          <Button 
+            variant="secondary" 
+            onClick={() => {setShowModal(true); setIsrandomQuestion(false)}}
+            >
             Thêm câu hỏi từ ngân hành câu hỏi
           </Button>
           <Button 
             variant="secondary" 
             className="mx-5" 
+
             onClick={() => {setShowModal(false); setIsrandomQuestion(true); setSelectedQuestions([])}}>
             Thêm câu hỏi ngẩu nhiên theo ma trận
           </Button>

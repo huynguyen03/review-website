@@ -1,0 +1,18 @@
+Câu hỏi: Thủ đô của Việt Nam là gì?
+Loại: short_answer
+Đáp án: Hà Nội
+Mức độ: 2
+
+Câu hỏi: Màu sắc của lá cây chủ yếu là gì?
+Loại: short_answer
+Đáp án: Xanh
+Mức độ: 2
+
+Câu hỏi: Đâu là thủ đô của Nhật Bản?
+Loại: multiple_choice
+A. Bắc Kinh
+B. Seoul
+C. Tokyo
+D. Bangkok
+Đáp án: Tokyo
+Mức độ: 2

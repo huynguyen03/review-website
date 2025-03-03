@@ -15,30 +15,125 @@ const ExamSimulation = ({ exam, userRole, onBack }) => {
   const [analysis, setAnalysis] = useState(null); // 🔹 Thêm state để lưu analysis từ ScoreCalculator
   const [isScoreCalculated, setIsScoreCalculated] = useState(false); // 🔹 Thêm state kiểm soát tính điểm
   const [currentPage, setCurrentPage] = useState(1); // Trạng thái cho trang hiện tại
+  const [isRandomExam, setIsRandomExam] = useState(false); // Trạng thái bài thi câu hỏi ngẫu nhiên
   const QUESTIONS_PER_PAGE = 4;  // Giới hạn số câu hỏi mỗi trang
 
-  const fetchQuestions = useCallback(async () => {
-    try {
-      const response = await fetch(`http://localhost/react_api/fetch_exam_questions.php?exam_id=${exam.exam_id}`);
+
+  // Hàm kiểm tra xem bài thi có lấy câu hỏi ngẫu nhiên không
+const checkExamType = useCallback(async () => {
+  try {
+    const response = await fetch(`http://localhost/react_api/check_exam_type.php?exam_id=${exam.exam_id}`);
+    
+    if (!response.ok) {
+      throw new Error(`Lỗi kiểm tra kiểu bài thi: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setIsRandomExam(data.is_random_question); // Giả sử API trả về { is_random: true/false }
+    console.log('bài thì có random không: ', data.is_random_question)
+
+  } catch (error) {
+    console.error("Lỗi khi kiểm tra kiểu bài thi:", error);
+  }
+}, [exam.exam_id]);
+
+// Hàm tải câu hỏi của bài thi (dùng cho cả bài thi thông thường và ngẫu nhiên)
+const fetchQuestions = useCallback(async () => {
+  try {
+    const response = await fetch(`http://localhost/react_api/fetch_exam_questions.php?exam_id=${exam.exam_id}`);
+    
+    if (!response.ok) {
+      throw new Error(`Lỗi tải câu hỏi: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setQuestions(data);
+    console.log("Câu hỏi nhận về:", data);
+  } catch (error) {
+    console.error("Lỗi khi tải câu hỏi:", error);
+  }
+}, [exam.exam_id]);
+
+// Hàm lấy câu hỏi ngẫu nhiên nếu bài thi có lấy câu hỏi từ ngân hàng
+const fetchRandomQuestions = useCallback(async () => {
+  try {
+    const response = await fetch(`http://localhost/react_api/fetch_random_questions.php?exam_id=${exam.exam_id}`);
+    
+    if (!response.ok) {
+      throw new Error(`Lỗi khi lấy câu hỏi ngẫu nhiên: ${response.status}`);
+    }
+
+    // const randomQuestions = await response.json();
+    
+    // Gửi câu hỏi vừa lấy để lưu vào bảng câu hỏi của bài thi
+    // await fetch(`http://localhost/react_api/save_exam_questions.php`, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ exam_id: exam.exam_id, questions: randomQuestions }),
+    // });
+
+    // Gọi lại hàm fetchQuestions() để lấy danh sách câu hỏi đã cập nhật vào bảng
+    fetchQuestions();
+  } catch (error) {
+    console.error("Lỗi khi lấy và lưu câu hỏi ngẫu nhiên:", error);
+  }
+}, [exam.exam_id, fetchQuestions]);
+
+
+useEffect(() => {
+  checkExamType();
+}, [checkExamType]); // Chạy một lần duy nhất khi component mount
+
+// Khi bài thi bắt đầu, lấy câu hỏi phù hợp
+useEffect(() => {
+
+
+  if (isStarted) {
+
+    if (isRandomExam) {
+      fetchRandomQuestions(); // Nếu bài thi lấy câu hỏi ngẫu nhiên, gọi API lấy câu hỏi từ ngân hàng
+    } else {
+      fetchQuestions(); // Nếu bài thi bình thường, gọi API lấy câu hỏi như cũ
+    }
+  }
+}, [checkExamType, isStarted, isRandomExam, fetchQuestions, fetchRandomQuestions]);
+
+  // const fetchQuestions = useCallback(async () => {
+  //   try {
+  //     const response = await fetch(`http://localhost/react_api/fetch_exam_questions.php?exam_id=${exam.exam_id}`);
       
-      if (!response.ok) {
-        throw new Error(`Lỗi tải câu hỏi: ${response.status}`);
-      }
+  //     if (!response.ok) {
+  //       throw new Error(`Lỗi tải câu hỏi: ${response.status}`);
+  //     }
 
+  //     const data = await response.json();
+  //     setQuestions(data);
+  //     console.log("câu hỏi nhận về khi gọi lấy câu hỏi bài thi: ", data)
+  //   } catch (error) {
+  //     console.error("Lỗi khi tải câu hỏi:", error);
+  //   }
+  // }, [exam.exam_id]);
+
+  // useEffect(() => {
+  //   if (isStarted) {
+  //     fetchQuestions();
+  //   }
+  // }, [isStarted, fetchQuestions]);
+
+  const deleteClonedQuestions = async (examId) => {
+    try {
+      const response = await fetch("http://localhost/react_api/delete_cloned_questions.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ exam_id: examId }),
+      });
+  
       const data = await response.json();
-      setQuestions(data);
-      console.log("câu hỏi nhận về khi gọi lấy câu hỏi bài thi: ", data)
+      console.log("Kết quả xóa cloned questions:", data);
     } catch (error) {
-      console.error("Lỗi khi tải câu hỏi:", error);
+      console.error("Lỗi khi xóa cloned questions:", error);
     }
-  }, [exam.exam_id]);
-
-  useEffect(() => {
-    if (isStarted) {
-      fetchQuestions();
-    }
-  }, [isStarted, fetchQuestions]);
-
+  };
   // Hàm nhận điểm số & phân tích từ ScoreCalculator
   const handleScoreCalculated = (score, analysisData) => {
     console.log("📊 Điểm số cuối cùng:", score);
@@ -219,7 +314,14 @@ const ExamSimulation = ({ exam, userRole, onBack }) => {
                     </Button>
                   ))}
                 </div>
-                <Button className="mt-5" variant="danger" onClick={handleFinalSubmit}>Nộp bài</Button>
+                <Button 
+                  className="mt-5" 
+                  variant="danger" 
+                  onClick={() => {
+                    handleFinalSubmit(); 
+                    deleteClonedQuestions(exam.exam_id);
+                  }}
+                  >Nộp bài</Button>
               </Card>
             </Col>
           )}

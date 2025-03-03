@@ -1,0 +1,19 @@
+Câu hỏi: Ai là người sáng lập ra Microsoft?
+Loại: short_answer
+Đáp án: Bill Gates
+Mức độ: 1
+
+Câu hỏi: Thời gian Trái Đất quay quanh Mặt Trời là bao lâu?
+Loại: short_answer
+Đáp án: 365 ngày
+Mức độ: 1
+
+Câu hỏi: Nguyên tố hóa học nào có ký hiệu là O?
+Loại: short_answer
+Đáp án: Oxy
+Mức độ: 1
+
+Câu hỏi: Đơn vị đo khối lượng trong hệ SI là gì?
+Loại: short_answer
+Đáp án: Kilogram (kg)
+Mức độ: 1
