@@ -1,0 +1,171 @@
+Câu hỏi: Trường nào trong bảng banthuam (idBanthuam, idBannhac, idCasi) là khóa ngoài?
+Loại: multiple_choice
+A. idBanthuam
+B. idBannhac và idCasi
+C. tenBannhac
+D. tenCasi
+Đáp án: B. idBannhac và idCasi
+Mức độ: 2
+
+Câu hỏi: Hệ quản trị CSDL MySQL chủ yếu được sử dụng trong các trường hợp nào?
+Loại: multiple_choice
+A. Chỉ dành cho hệ thống nhỏ
+B. Các hệ thống CSDL lớn và ứng dụng trên Internet
+C. Các hệ thống không đòi hỏi tính an toàn cao
+D. Hệ thống không có kết nối mạng
+Đáp án: B. Các hệ thống CSDL lớn và ứng dụng trên Internet
+Mức độ: 2
+
+Câu hỏi: Khi muốn xóa tất cả các bản ghi trong bảng "nhacsi", nhưng vẫn giữ cấu trúc bảng, ta sử dụng câu lệnh nào?
+Loại: multiple_choice
+A. DELETE FROM nhacsi
+B. DROP TABLE nhacsi
+C. TRUNCATE TABLE nhacsi
+D. DELETE * FROM nhacsi
+Đáp án: C. TRUNCATE TABLE nhacsi
+Mức độ: 2
+
+Câu hỏi: Một tính năng đặc biệt của HeidiSQL là gì?
+Loại: multiple_choice
+A. Chỉ hỗ trợ MySQL
+B. Hỗ trợ nhiều ngôn ngữ, bao gồm tiếng Việt
+C. Không hỗ trợ kết nối Internet
+D. Chỉ có trên hệ điều hành Windows
+Đáp án: B. Hỗ trợ nhiều ngôn ngữ, bao gồm tiếng Việt
+Mức độ: 3
+
+Câu hỏi: Thao tác nào được sử dụng để khai báo khóa chính cho trường idBannhac?
+Loại: multiple_choice
+A. Chọn "Create new index" → "UNIQUE"
+B. Chọn "Create new index" → "PRIMARY"
+C. Chọn "Create new index" → "FOREIGN KEY"
+D. Chọn "Create new index" → "INDEX"
+Đáp án: B. Chọn "Create new index" → "PRIMARY"
+Mức độ: 3
+
+Câu hỏi: Lợi ích của việc sử dụng kiểu dữ liệu AUTO_INCREMENT cho các trường khóa chính là gì?
+Loại: multiple_choice
+A. Tự động tăng giá trị khi thêm bản ghi mới
+B. Đảm bảo giá trị duy nhất cho mỗi bản ghi
+C. Giúp truy vấn dữ liệu nhanh hơn
+D. Cả A và B
+Đáp án: D. Cả A và B
+Mức độ: 2
+
+Câu hỏi: Tại sao cần phải có khóa ngoài trong cơ sở dữ liệu quan hệ?
+Loại: multiple_choice
+A. Để giảm trùng lặp dữ liệu
+B. Để tạo mối liên hệ giữa các bảng
+C. Để làm cho truy vấn nhanh hơn
+D. Để quản lý được nhiều dữ liệu hơn
+Đáp án: B. Để tạo mối liên hệ giữa các bảng
+Mức độ: 3
+
+Câu hỏi: Để thiết lập trường "idNhacsi" làm khóa chính, ta phải thực hiện thao tác nào?
+Loại: multiple_choice
+A. Chọn AUTO_INCREMENT
+B. Chọn khóa ngoại
+C. Chọn PRIMARY trong phần Create new index
+D. Chọn VARCHAR
+Đáp án: C. Chọn PRIMARY trong phần Create new index
+Mức độ: 3
+
+Câu hỏi: Nếu vô tình chọn sai trường làm khóa chính, cách nào sau đây đúng để sửa lại?
+Loại: multiple_choice
+A. Xóa bảng và tạo lại
+B. Nhấp chuột phải vào trường sai và chọn Delete column
+C. Nhấp đúp chuột vào trường sai và sửa lại khóa chính
+D. Đặt trường sai làm khóa ngoại
+Đáp án: C. Nhấp đúp chuột vào trường sai và sửa lại khóa chính
+Mức độ: 3
+
+Câu hỏi: Lợi ích của hệ quản trị CSDL trong lĩnh vực ngân hàng là gì?
+Loại: multiple_choice
+A. Giảm thiểu nhân lực
+B. Tăng thời gian xử lý giao dịch
+C. Đảm bảo giao dịch chính xác và nhanh chóng
+D. Hạn chế khả năng tự động hóa
+Đáp án: C. Đảm bảo giao dịch chính xác và nhanh chóng
+Mức độ: 3
+
+Câu hỏi: Khi khai báo trường "tenNhacsi", kiểu dữ liệu nào phù hợp để lưu tên của nhạc sĩ?
+Loại: multiple_choice
+A. INT
+B. VARCHAR
+C. FLOAT
+D. DATE
+Đáp án: B. VARCHAR
+Mức độ: 2
+
+Câu hỏi: Khi cập nhật dữ liệu trong một bảng có tham chiếu đến bảng khác (có khóa ngoài), bạn cần lưu ý điều gì để đảm bảo tính toàn vẹn của cơ sở dữ liệu?
+Loại: multiple_choice
+A. Bạn có thể tự do cập nhật giá trị trong bảng chính mà không cần quan tâm đến bảng tham chiếu.
+B. Cần kiểm tra xem các giá trị bạn cập nhật có bị vi phạm các ràng buộc khóa ngoài với bảng tham chiếu hay không.
+C. Việc cập nhật dữ liệu trong bảng có khóa ngoài sẽ tự động cập nhật các bảng tham chiếu liên quan.
+D. Việc cập nhật dữ liệu trong bảng tham chiếu sẽ không ảnh hưởng đến bảng chính có khóa ngoài.
+Đáp án: B. Cần kiểm tra xem các giá trị bạn cập nhật có bị vi phạm các ràng buộc khóa ngoài với bảng tham chiếu hay không.
+Mức độ: 4
+
+Câu hỏi: Khi tạo bảng "bannhac", để thêm một trường mới vào bảng, bạn sử dụng thao tác nào?
+Loại: multiple_choice
+A. Nhấn Ctrl+Alt+Del
+B. Nhấn Ctrl+Insert
+C. Nhấn Ctrl+Delete
+D. Nhấn Alt+Insert
+Đáp án: D. Nhấn Alt+Insert
+Mức độ: 2
+
+Câu hỏi: Câu lệnh SQL nào dùng để lấy tất cả các trường trong bảng "nhacsi"?
+Loại: multiple_choice
+A. SELECT * FROM nhacsi
+B. SELECT idNhacsi, tenNhacsi FROM nhacsi
+C. SELECT nhacsi.* FROM nhacsi
+D. SELECT * FROM nhacsi WHERE idNhacsi > 0
+Đáp án: A. SELECT * FROM nhacsi
+Mức độ: 2
+
+Câu hỏi: Khi bạn muốn thêm một ca sĩ vào bảng casi nhưng không có thông tin về tên của ca sĩ đó, bạn nên làm gì?
+Loại: multiple_choice
+A. Để trường tên ca sĩ trống và nhập thông tin sau
+B. Nhập "Không xác định" vào trường tên ca sĩ
+C. Sử dụng giá trị mặc định cho trường tên ca sĩ
+D. Xóa ca sĩ khỏi danh sách
+Đáp án: A. Để trường tên ca sĩ trống và nhập thông tin sau
+Mức độ: 3
+
+Câu hỏi: Để xem toàn bộ dữ liệu trong bảng "nhacsi" trong HeidiSQL, ta thực hiện thao tác nào?
+Loại: multiple_choice
+A. Mở bảng "nhacsi" và nhấn F5
+B. Chọn thẻ "Truy vấn", nhập câu truy vấn SQL
+C. Chọn thẻ "Thiết kế bảng"
+D. Mở bảng "nhacsi" và chọn thẻ "Dữ liệu"
+Đáp án: D. Mở bảng "nhacsi" và chọn thẻ "Dữ liệu"
+Mức độ: 3
+
+Câu hỏi: Để cập nhật thông tin một sinh viên trong bảng SinhVien có mã số sinh viên là 'SV001' thành 'Học Bổng' trong trường HọcBổng, bạn sẽ sử dụng câu lệnh SQL nào dưới đây?
+Loại: multiple_choice
+A. UPDATE SinhVien SET HọcBổng = 'Học Bổng' WHERE MaSV = 'SV001';
+B. SELECT * FROM SinhVien WHERE MaSV = 'SV001';
+C. INSERT INTO SinhVien (HọcBổng) VALUES ('Học Bổng') WHERE MaSV = 'SV001';
+D. DELETE FROM SinhVien WHERE MaSV = 'SV001';
+Đáp án: A. UPDATE SinhVien SET HọcBổng = 'Học Bổng' WHERE MaSV = 'SV001';
+Mức độ: 3
+
+Câu hỏi: Câu lệnh SQL nào dưới đây được sử dụng để truy vấn thông tin từ một bảng với điều kiện lọc dữ liệu dựa trên nhiều điều kiện?
+Loại: multiple_choice
+A. UPDATE SinhVien SET Diem = 10 WHERE MaSV = 'SV002';
+B. SELECT * FROM SinhVien GROUP BY Tuoi;
+C. INSERT INTO SinhVien (Ten, Tuoi) VALUES ('John', 20);
+D. SELECT * FROM SinhVien WHERE Tuoi > 18 AND Diem > 7;
+Đáp án: D. SELECT * FROM SinhVien WHERE Tuoi > 18 AND Diem > 7;
+Mức độ: 2
+
+Câu hỏi: Để tạo khóa ngoài liên kết trường MaSV trong bảng DiemThi với bảng SinhVien, câu lệnh SQL nào sau đây là đúng?
+Loại: multiple_choice
+A. FOREIGN KEY (MaSV) REFERENCES SinhVien(MaSV)
+B. PRIMARY KEY (MaSV) REFERENCES SinhVien(MaSV)
+C. CONSTRAINT MaSV FOREIGN KEY (MaSV) FROM SinhVien(MaSV)
+D. FOREIGN KEY (MaSV) LINKS TO SinhVien(MaSV)
+Đáp án: A. FOREIGN KEY (MaSV) REFERENCES SinhVien(MaSV)
+Mức độ: 3
+

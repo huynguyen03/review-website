@@ -5,7 +5,7 @@ import ExamSimulation from "./ExamSimulation";
 import QuizSettings from "./QuizSettings"; 
 import CreateQuiz from "./CreateQuiz"; 
 
-const QuizList = ({ userRole }) => {
+const QuizList = ({ userRole, userId }) => {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedExam, setSelectedExam] = useState(null); // 🔹 Lưu bài thi được chọn
@@ -96,7 +96,7 @@ const QuizList = ({ userRole }) => {
               </Alert>
             )
           ) : action === "settings" ? (
-            <QuizSettings examId={queryParams.get("id")} onBack={() => navigate("/teacher?section=my_quiz")} />
+            <QuizSettings userId={userId} examId={queryParams.get("id")} onBack={() => navigate("/teacher?section=my_quiz")} />
           ) : (
             <>
               <h2>Bài tập của tôi</h2>

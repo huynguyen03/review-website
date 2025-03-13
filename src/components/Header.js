@@ -3,34 +3,45 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../assets/images/logo/logo_transparent_blue.png';
 import avatar from '../assets/images/avartar_defaul_1.png';
 
+import AccountInfo from "./AccountInfo";
+
 const Header = ({ user, onLogout, onAuthClick }) => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false); // Trạng thái menu dropdown
-  const dropdownRef = useRef(null); // Tham chiếu đến Dropdown
+  const [showModalAcc, setShowModalAcc] = useState(false); // Trạng thái modal
 
-  // Xử lý sự kiện click bên ngoài Dropdown
+  const dropdownRef = useRef(null); // Tham chiếu đến Dropdown
+  const modalRef = useRef(null); // Tham chiếu đến Modal
+
+  // Mở modal khi nhấn nút "Thông tin tài khoản"
+  const handleShowModal = () => setShowModalAcc(true);
+  const handleHideModal = () => setShowModalAcc(false);
+
+  // Xử lý sự kiện click bên ngoài Dropdown và Modal
   const handleClickOutside = (event) => {
+    // Tắt Dropdown nếu click bên ngoài Dropdown
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setShowDropdown(false); // Tắt Dropdown nếu click bên ngoài
+      setShowDropdown(false);
+    }
+
+    // Tắt Modal nếu click bên ngoài Modal
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      setShowModalAcc(false);
     }
   };
 
   // Thêm và loại bỏ sự kiện mousedown
   useEffect(() => {
-    if (showDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
 
     // Cleanup sự kiện khi component unmount
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showDropdown]);
+  }, []);
 
   return (
-    <header className="bg-white border-bottom sticky-top" style={{height: "80px"}}>
+    <header className="bg-white border-bottom sticky-top" style={{ height: "80px" }}>
       <nav className="navbar navbar-expand-lg navbar-light mx-5">
         <a href="/" className="navbar-brand">
           <img src={logo} alt="Logo" width="120" />
@@ -66,7 +77,7 @@ const Header = ({ user, onLogout, onAuthClick }) => {
                     borderRadius: "50px",
                     cursor: "pointer",
                   }}
-                  onClick={() => setShowDropdown(!showDropdown)}
+                  onClick={() => setShowDropdown(!showDropdown)} // Toggle dropdown
                 >
                   <img
                     src={avatar}
@@ -93,7 +104,7 @@ const Header = ({ user, onLogout, onAuthClick }) => {
                         <li>
                           <button
                             className="btn btn-link w-100 text-start"
-                            onClick={() => alert("Thông tin tài khoản")}
+                            onClick={() => handleShowModal()} // Show modal
                           >
                             Thông tin tài khoản
                           </button>
@@ -104,6 +115,7 @@ const Header = ({ user, onLogout, onAuthClick }) => {
                             onClick={() => {
                               onLogout();
                               localStorage.removeItem("lastPath"); // Xóa thông tin trang cuối cùng
+                              setShowModalAcc(false)
                               navigate("/"); // Quay lại trang chủ khi đăng xuất
                             }}
                           >
@@ -126,6 +138,14 @@ const Header = ({ user, onLogout, onAuthClick }) => {
           </ul>
         </div>
       </nav>
+
+      {/* Modal hiển thị thông tin tài khoản */}
+      <AccountInfo
+        show={showModalAcc}
+        onHide={handleHideModal}
+        userId={user?.user_id || "0"} // Truyền id người dùng vào modal
+        ref={modalRef} // Gắn tham chiếu vào Modal
+      />
     </header>
   );
 };

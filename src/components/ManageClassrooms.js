@@ -1,16 +1,22 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Button, Card, Row, Col, Modal, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+
 import axios from "axios";
 
-const ManageClassrooms = ({ teacherId }) => {
+import ClassroomPractice from "./ClassroomPractice"
+
+const ManageClassrooms = ({ teacherId, roleId }) => {
   const [classrooms, setClassrooms] = useState([]);
   const [className, setClassName] = useState("");
   const [registrationPassword, setRegistrationPassword] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showClassroom, setShowClassroom] = useState(false);
   const [selectedClassroom, setSelectedClassroom] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [members, setMembers] = useState([]);
 
+  const navigate = useNavigate();
   // ✅ Lấy danh sách lớp học
   const fetchClassrooms = useCallback(async () => {
     if (!teacherId) return;
@@ -36,6 +42,13 @@ const ManageClassrooms = ({ teacherId }) => {
     }
   };
 
+const handleEnterClassroom = (classroom) => {
+  console.log("ID lớp truyền", classroom.classroom_id)
+  setSelectedClassroom(classroom);
+  setShowClassroom(true);
+  setShowDetails(false)
+}
+
   // ✅ Xử lý chọn lớp học
   const handleManageClassroom = (classroom) => {
     setSelectedClassroom(classroom);
@@ -47,7 +60,7 @@ const ManageClassrooms = ({ teacherId }) => {
 
   // ✅ Xử lý cập nhật lớp học
   const handleUpdateClass = async () => {
-    if (!selectedClassroom) return;
+    // if (!selectedClassroom) return;
 
     try {
       await axios.post(`http://localhost/react_api/update_classroom.php`, {
@@ -70,6 +83,33 @@ const ManageClassrooms = ({ teacherId }) => {
       console.error("❌ Lỗi cập nhật lớp học:", error);
     }
   };
+
+  // ✅ Xử lý tạo lớp học
+const handleCreateClass = async () => {
+  // Kiểm tra dữ liệu đầu vào
+  if (!className || !teacherId) {
+    alert("Vui lòng nhập đầy đủ tên lớp học và mã giảng viên.");
+    return;
+  }
+
+  try {
+    // Gửi yêu cầu tạo lớp học
+    const response = await axios.post(`http://localhost/react_api/create_classroom.php`, {
+      class_name: className,
+      teacher_id: teacherId,
+    });
+
+    const newClassroom = response.data;
+
+    // Cập nhật danh sách lớp học
+    setClassrooms((prev) => [...prev, newClassroom]);
+
+    setClassName(""); // Reset lại tên lớp
+    alert("✅ Lớp học đã được tạo thành công!");
+  } catch (error) {
+    console.error("❌ Lỗi tạo lớp học:", error);
+  }
+};
 
   // ✅ Xử lý xóa thành viên
   const handleKickMember = async (studentId) => {
@@ -98,11 +138,11 @@ const ManageClassrooms = ({ teacherId }) => {
         ← Quay lại
       </Button>
 
-      <h2>Quản lý lớp học</h2>
 
       {/* Danh sách lớp học */}
-      {!showDetails && (
+      {!showDetails && !showClassroom &&(
         <div>
+          <h2>Quản lý lớp học</h2>
           <Button variant="primary" className="mb-3" onClick={() => setShowModal(true)}>
             + Tạo lớp học mới
           </Button>
@@ -117,6 +157,9 @@ const ManageClassrooms = ({ teacherId }) => {
                       Giáo viên: {classroom.teacher_name}
                     </Card.Subtitle>
                     <Card.Text>Ngày tạo: {new Date(classroom.created_at).toLocaleString()}</Card.Text>
+                    <Button variant="primary" onClick={() => {handleEnterClassroom(classroom); navigate(`/teacher?section=manage_classrooms&sub=classroom`)}}>
+                          Vào Lớp học
+                      </Button>
                     <Button variant="warning" onClick={() => handleManageClassroom(classroom)}>
                       Quản lý thành viên & Chỉnh sửa lớp
                     </Button>
@@ -127,7 +170,9 @@ const ManageClassrooms = ({ teacherId }) => {
           </Row>
         </div>
       )}
-
+{/* Hiển thị ClassroomPractice nếu showClassroomPractice là true */}
+{showClassroom && <ClassroomPractice classroomId={selectedClassroom.classroom_id} userId={teacherId} roleId={roleId}/>}
+    
       {/* Chi tiết lớp học */}
       {showDetails && selectedClassroom && (
         <div className="mt-4">
@@ -202,7 +247,7 @@ const ManageClassrooms = ({ teacherId }) => {
               />
             </Form.Group>
 
-            <Button variant="primary" onClick={handleUpdateClass}>
+            <Button variant="primary" onClick={() => handleCreateClass()}>
               Tạo lớp
             </Button>
           </Form>

@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, Row, Col } from "react-bootstrap";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-import RealExam from "./RealExam";
+import ExamSimulation from "./ExamSimulation";
+import ClassroomPractice from "./ClassroomPractice";
 
-const HomePage = ({ studentId }) => {
+
+
+
+const HomePage = ({ userId, roleId }) => {
   const [selectedExam, setSelectedExam] = useState(null); // Chọn bài thi
   const [publicExams, setPublicExams] = useState([]); // Danh sách bài thi công khai
   const [publicClassrooms, setPublicClassrooms] = useState([]); // Danh sách lớp học công khai
   const [joinedClassrooms, setJoinedClassrooms] = useState({}); // Trạng thái tham gia lớp học
-  const navigate = useNavigate();
+  const [selectedClassroom, setSelectedClassroom] = useState(null);//chọn lớp học
+    
+    const [showClassroom, setShowClassroom] = useState(false);//vào lớp học
 
   // Lấy danh sách bài thi công khai
   useEffect(() => {
@@ -42,7 +47,7 @@ const HomePage = ({ studentId }) => {
   useEffect(() => {
     const fetchJoinedClassrooms = async () => {
       try {
-        const response = await axios.get(`http://localhost/react_api/fetch_my_classrooms.php?user_id=${studentId}`);
+        const response = await axios.get(`http://localhost/react_api/fetch_my_classrooms.php?user_id=${userId}`);
         if (Array.isArray(response.data)) {
           const joinedClassroomsMap = {};
           response.data.forEach((classroom) => {
@@ -55,21 +60,21 @@ const HomePage = ({ studentId }) => {
       }
     };
 
-    if (studentId) {
+    if (userId) {
       fetchJoinedClassrooms();
     }
-  }, [studentId]);
+  }, [userId]);
 
   // Tham gia lớp học công khai
   const handleJoinClassroom = async (classroomId) => {
-    if (!studentId || !classroomId) {
+    if (!userId || !classroomId) {
       alert("Lỗi: Thiếu thông tin học sinh hoặc lớp học!");
       return;
     }
 
     try {
       const response = await axios.post("http://localhost/react_api/join_classroom.php", {
-        student_id: studentId,
+        student_id: userId,
         classroom_id: classroomId,
       });
 
@@ -88,69 +93,79 @@ const HomePage = ({ studentId }) => {
     }
   };
 
-  // Vào lớp học (chuyển trang)
-  const handleEnterClassroom = (classroomId) => {
-    navigate(`/classroom/${classroomId}`);
-  };
 
+  const handleEnterClassroom = (classroom) => {
+    console.log("ID lớp truyền", classroom.classroom_id)
+    setSelectedClassroom(classroom);
+    setShowClassroom(true)
+  }
   if (selectedExam) {
-    return <RealExam exam={selectedExam} studentId={studentId} onBack={() => setSelectedExam(null)} />;
+    return <ExamSimulation exam={selectedExam} studentId={userId} onBack={() => setSelectedExam(null)} />;
   }
 
   return (
     <div>
-      {/* DANH SÁCH BÀI THI CÔNG KHAI */}
-      <h2 className="mt-4">Bài thi công khai</h2>
-      {publicExams.length === 0 ? (
-        <p>Không có bài thi công khai.</p>
+      {/* Hiển thị ClassroomPractice nếu showClassroomPractice là true */}
+      {showClassroom ? (
+        <ClassroomPractice classroomId={selectedClassroom.classroom_id} userId={userId} roleId={roleId} />
       ) : (
-        <Row>
-          {publicExams.map((exam) => (
-            <Col key={exam.exam_id} md={4} className="mb-3">
-              <Card>
-                <Card.Body>
-                  <Card.Title>{exam.exam_name}</Card.Title>
-                  <Card.Text>Thời gian làm bài: {exam.time_limit} phút</Card.Text>
-                  <Button variant="primary" onClick={() => setSelectedExam(exam)}>
-                    Vào bài thi
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      )}
+        <>
+          {/* DANH SÁCH BÀI THI CÔNG KHAI */}
+          <h2 className="mt-4">Bài thi công khai</h2>
+          {publicExams.length === 0 ? (
+            <p>Không có bài thi công khai.</p>
+          ) : (
+            <Row>
+              {publicExams.map((exam) => (
+                <Col key={exam.exam_id} md={4} className="mb-3">
+                  <Card>
+                    <Card.Body>
+                      <Card.Title>{exam.exam_name}</Card.Title>
+                      <Card.Text>Thời gian làm bài: {exam.time_limit} phút</Card.Text>
+                      <Button variant="primary" onClick={() => setSelectedExam(exam)}>
+                        Vào bài thi
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
 
-      {/* DANH SÁCH LỚP HỌC CÔNG KHAI */}
-      <h2 className="mt-4">Lớp học công khai</h2>
-      {publicClassrooms.length === 0 ? (
-        <p>Không có lớp học công khai.</p>
-      ) : (
-        <Row>
-          {publicClassrooms.map((classroom) => (
-            <Col key={classroom.classroom_id} md={4} className="mb-3">
-              <Card>
-                <Card.Body>
-                  <Card.Title>{classroom.class_name}</Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">Giáo viên: {classroom.teacher_name}</Card.Subtitle>
-                  <Card.Text>Ngày tạo: {new Date(classroom.created_at).toLocaleString()}</Card.Text>
+          {/* DANH SÁCH LỚP HỌC CÔNG KHAI */}
+          <h2 className="mt-4">Lớp học công khai</h2>
+          {publicClassrooms.length === 0 ? (
+            <p>Không có lớp học công khai.</p>
+          ) : (
+            <Row>
+              {publicClassrooms.map((classroom) => (
+                <Col key={classroom.classroom_id} md={4} className="mb-3">
+                  <Card>
+                    <Card.Body>
+                      <Card.Title>{classroom.class_name}</Card.Title>
+                      <Card.Subtitle className="mb-2 text-muted">Giáo viên: {classroom.teacher_name}</Card.Subtitle>
+                      <Card.Text>Ngày tạo: {new Date(classroom.created_at).toLocaleString()}</Card.Text>
 
-                  {/* Kiểm tra xem học sinh đã tham gia lớp học chưa */}
-                  {joinedClassrooms[classroom.classroom_id] ? (
-                    <Button variant="primary" onClick={() => handleEnterClassroom(classroom.classroom_id)}>
-                      Vào lớp học
-                    </Button>
-                  ) : (
-                    <Button variant="info" onClick={() => handleJoinClassroom(classroom.classroom_id)}>
-                      Đăng ký Lớp học này
-                    </Button>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      )}
+                      {/* Kiểm tra xem học sinh đã tham gia lớp học chưa */}
+                      {joinedClassrooms[classroom.classroom_id] ? (
+                        <Button variant="primary" onClick={() => handleEnterClassroom(classroom.classroom_id)}>
+                          Vào lớp học
+                        </Button>
+                      ) : (
+                        <Button variant="info" onClick={() => handleJoinClassroom(classroom.classroom_id)}>
+                          Đăng ký Lớp học này
+                        </Button>
+                      )}
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
+        </>
+        )
+      }
+
     </div>
   );
 };

@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, Row, Col } from "react-bootstrap";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import ClassroomPractice from "./ClassroomPractice";
 
-const StudentClassrooms = ({ studentId }) => {
+
+const StudentClassrooms = ({ userId , roleId}) => {
   const [publicClassrooms, setPublicClassrooms] = useState([]); // Lớp học công khai
   const [enrolledClassrooms, setEnrolledClassrooms] = useState([]); // Lớp học đã tham gia
-  const navigate = useNavigate();
+    const [selectedClassroom, setSelectedClassroom] = useState(null);//chọn lớp học
+  
+  const [showClassroom, setShowClassroom] = useState(false);//vào lớp học
+
 
   // Lấy danh sách Lớp học công khai
   useEffect(() => {
@@ -25,7 +29,7 @@ const StudentClassrooms = ({ studentId }) => {
   useEffect(() => {
     const fetchEnrolledClassrooms = async () => {
       try {
-        const response = await axios.get(`http://localhost/react_api/fetch_my_classrooms.php?user_id=${studentId}`);
+        const response = await axios.get(`http://localhost/react_api/fetch_my_classrooms.php?user_id=${userId}`);
         if (Array.isArray(response.data)) {
           setEnrolledClassrooms(response.data);
         }
@@ -34,22 +38,25 @@ const StudentClassrooms = ({ studentId }) => {
       }
     };
 
-    if (studentId) {
+    if (userId) {
       fetchEnrolledClassrooms();
     }
-  }, [studentId]);
+  }, [userId]);
 
   // Tham gia lớp học công khai
   const handleJoinClassroom = async (classroomId) => {
-    if (!studentId || !classroomId) {
+    console.log("id người dùng và id lớp học muốn đk", userId, classroomId)
+
+    if (!userId || !classroomId) {
       alert("Lỗi: Thiếu thông tin học sinh hoặc lớp học!");
       return;
     }
 
     try {
       const response = await axios.post("http://localhost/react_api/join_classroom.php", {
-        student_id: studentId,
+        student_id: userId,
         classroom_id: classroomId,
+
       });
 
       if (response.data.success) {
@@ -69,15 +76,22 @@ const StudentClassrooms = ({ studentId }) => {
   };
 
   // Vào lớp học (chuyển trang)
-  const handleEnterClassroom = (classroomId) => {
-    navigate(`/classroom/${classroomId}`);
-  };
+  const handleEnterClassroom = (classroom) => {
+    console.log("ID lớp truyền", classroom.classroom_id)
+    setSelectedClassroom(classroom);
+    setShowClassroom(true)
+  }
 
   return (
     <div>
-      <h2>Lớp học của tôi</h2>
+      {/* Hiển thị ClassroomPractice nếu showClassroomPractice là true */}
+      {showClassroom ? (
+        <ClassroomPractice classroomId={selectedClassroom.classroom_id} userId={userId} roleId={roleId}/>
+      ) : (
 
-      {/* Danh sách Lớp học đã tham gia */}
+        <>
+        <h2>Lớp học của tôi</h2>
+
       <Row>
         {enrolledClassrooms.length === 0 ? (
           <p>Bạn chưa tham gia lớp học nào.</p>
@@ -89,7 +103,7 @@ const StudentClassrooms = ({ studentId }) => {
                   <Card.Title>{classroom.class_name}</Card.Title>
                   <Card.Subtitle className="mb-2 text-muted">Giáo viên: {classroom.teacher_name}</Card.Subtitle>
                   <Card.Text>Ngày tham gia: {new Date(classroom.enrolled_at).toLocaleString()}</Card.Text>
-                  <Button variant="primary" onClick={() => handleEnterClassroom(classroom.classroom_id)}>
+                  <Button variant="primary" onClick={() => { handleEnterClassroom(classroom) }}>
                     Vào Lớp học
                   </Button>
                 </Card.Body>
@@ -122,8 +136,9 @@ const StudentClassrooms = ({ studentId }) => {
           ))
         )}
       </Row>
+      </>
+  )}
     </div>
-  );
-};
-
-export default StudentClassrooms;
+  )
+}
+  export default StudentClassrooms;

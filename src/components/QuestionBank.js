@@ -2,13 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useQuestions } from "./QuestionContext";
 import AddQuestionModal from "./AddQuestionModal"; // Component thêm câu hỏi thủ công
+import CategorySelect from "./CategorySelect"; // Component thêm câu hỏi thủ công
+
 import EditQuestion from "./EditQuestion";
+
+
 
 const QuestionBank = ({ teacherId }) => {
   const { questions, fetchQuestions, updateQuestions } = useQuestions(); // Lấy danh sách câu hỏi từ context
   const [selectedQuestions, setSelectedQuestions] = useState([]); // Danh sách các câu hỏi được chọn
   const [showAddModal, setShowAddModal] = useState(false); // Hiển thị modal thêm câu hỏi
-  
+  const [allQuestions, setAllQuestions] = useState([]); // Lưu tất cả câu hỏi
+  const [filteredQuestions, setFilteredQuestions] = useState([]); // Câu hỏi sau khi lọc
+  const [categories, setCategories] = useState([]); // Danh sách danh mục
+  const [selectedCategory, setSelectedCategory] = useState(""); // Danh mục được chọn
+
   const location = useLocation();
 
   // Lấy danh sách câu hỏi khi component được mount hoặc khi teacherId thay đổi
@@ -30,6 +38,50 @@ const QuestionBank = ({ teacherId }) => {
       fetchQuestions(teacherId);
     }
   }, [location.search, teacherId, fetchQuestions]);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Gọi API lấy danh sách câu hỏi
+        const questionRes = await fetch(`http://localhost/react_api/fetch_questions.php?teacher_id=${teacherId}`);
+        const questionData = await questionRes.json();
+        setAllQuestions(questionData);
+        setFilteredQuestions(questionData); // Ban đầu hiển thị toàn bộ câu hỏi
+        console.log("Toàn bộ câu hỏi: ", questionData)
+
+        // Gọi API lấy danh sách danh mục
+        const categoryRes = await fetch("http://localhost/react_api/get_categories.php");
+        const categoryData = await categoryRes.json();
+        setCategories(categoryData);
+
+        console.log("Danh mục nhận về từ ngân hàng câu hỏi:", categoryData);
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu:", error);
+      }
+    };
+
+    fetchData();
+  }, [teacherId]);
+
+
+  // Khi chọn danh mục, cập nhật danh sách câu hỏi hiển thị
+  useEffect(() => {
+    if (selectedCategory === "") {
+      setFilteredQuestions(allQuestions); // Nếu không chọn danh mục, hiển thị tất cả
+    } else {
+      setFilteredQuestions(allQuestions.filter(q => q.category_id === Number(selectedCategory)));
+      console.log("đã nhận được câu hỏi log")
+    }
+    console.log("Danh mục đã chọn: ", selectedCategory)
+
+  }, [selectedCategory, allQuestions]);
+
+  useEffect(() => {
+    if (filteredQuestions === "") {
+      console.log("Dữ liệu đã lọc được", filteredQuestions)
+    }
+  })
 
   // Xử lý chọn/deselect câu hỏi
   const handleSelectQuestion = (questionId) => {
@@ -77,23 +129,26 @@ const QuestionBank = ({ teacherId }) => {
       .catch((err) => console.error("Error deleting questions:", err));
   };
 
-  
+
   const [editingQuestionId, setEditingQuestionId] = useState(null); // State lưu ID câu hỏi cần chỉnh sửa
-const [showEditModal, setShowEditModal] = useState(false); // Kiểm soát hiển thị modal chỉnh sửa
+  const [showEditModal, setShowEditModal] = useState(false); // Kiểm soát hiển thị modal chỉnh sửa
 
-const handleEditQuestions = () => {
-  if (selectedQuestions.length === 0) {
-    alert("Vui lòng chọn một câu hỏi để chỉnh sửa.");
-    return;
-  }
-  if (selectedQuestions.length > 1) {
-    alert("Chỉ chọn 1 câu hỏi để chỉnh sửa!!!");
-    return;
-  }
+  const handleEditQuestions = () => {
+    if (selectedQuestions.length === 0) {
+      alert("Vui lòng chọn một câu hỏi để chỉnh sửa.");
+      return;
+    }
+    if (selectedQuestions.length > 1) {
+      alert("Chỉ chọn 1 câu hỏi để chỉnh sửa!!!");
+      return;
+    }
 
-  setEditingQuestionId(selectedQuestions[0]); // Lưu ID câu hỏi cần chỉnh sửa
-  setShowEditModal(true); // Mở modal chỉnh sửa
-};
+    setEditingQuestionId(selectedQuestions[0]); // Lưu ID câu hỏi cần chỉnh sửa
+    setShowEditModal(true); // Mở modal chỉnh sửa
+  };
+//Hàm hiển thị danh mục
+
+
 
   return (
     <div className="mt-4">
@@ -106,8 +161,24 @@ const handleEditQuestions = () => {
           Thêm câu hỏi
         </button>
       </div>
+      {/* Dropdown chọn danh mục */}
+      <div className="mb-3">
+      <label htmlFor="categorySelect">Chọn danh mục:</label>
+      <select
+        id="categorySelect"
+        className="form-control"
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)}
+      >
+        <option value="">Tất cả</option>
+        {/* Gọi component CategorySelect */}
+        <CategorySelect categories={categories} questions={questions} />
+      </select>
+    </div>
 
-      {questions.length > 0 ? (
+
+
+      {filteredQuestions.length > 0 ? (
         <table className="table table-striped table-responsive" style={{ tableLayout: "fixed" }}>
           <thead>
             <tr>
@@ -120,6 +191,7 @@ const handleEditQuestions = () => {
                     } else {
                       setSelectedQuestions([]); // Bỏ chọn tất cả
                     }
+
                   }}
                 />
               </th>
@@ -133,7 +205,8 @@ const handleEditQuestions = () => {
             </tr>
           </thead>
           <tbody>
-            {questions.map((question) => (
+            {filteredQuestions.map((question) => (
+
               <tr key={question.question_id}>
                 <td>
                   <input
@@ -191,38 +264,38 @@ const handleEditQuestions = () => {
       </button>
 
       {showAddModal && (
-  <AddQuestionModal
-    teacherId={teacherId} // Đảm bảo truyền đúng teacherId
-    onClose={() => setShowAddModal(false)} // Đóng modal khi hoàn thành
-    onSuccess={() => {
-      fetchQuestions(); // Cập nhật danh sách câu hỏi sau khi thêm mới
-      setShowAddModal(false);
-    }}
-  />
-)}
+        <AddQuestionModal
+          teacherId={teacherId} // Đảm bảo truyền đúng teacherId
+          onClose={() => setShowAddModal(false)} // Đóng modal khi hoàn thành
+          onSuccess={() => {
+            fetchQuestions(); // Cập nhật danh sách câu hỏi sau khi thêm mới
+            setShowAddModal(false);
+          }}
+        />
+      )}
 
 
-<EditQuestion
-  show={showEditModal}
-  onHide={() => {
-    setShowEditModal(false);
-    setEditingQuestionId(null); // Reset ID sau khi đóng
-  }}
-  questionId={editingQuestionId}
-  teacherId={teacherId}
-  onQuestionUpdated={(updatedQuestion) => {
-    updateQuestions((prevQuestions) =>
-      prevQuestions.map((q) =>
-        q.question_id === updatedQuestion.question_id ? updatedQuestion : q
-      )
-    );
-    setShowEditModal(false);
-    setEditingQuestionId(null); // Reset ID sau khi cập nhật
-  }}
-/>
+      <EditQuestion
+        show={showEditModal}
+        onHide={() => {
+          setShowEditModal(false);
+          setEditingQuestionId(null); // Reset ID sau khi đóng
+        }}
+        questionId={editingQuestionId}
+        teacherId={teacherId}
+        onQuestionUpdated={(updatedQuestion) => {
+          updateQuestions((prevQuestions) =>
+            prevQuestions.map((q) =>
+              q.question_id === updatedQuestion.question_id ? updatedQuestion : q
+            )
+          );
+          setShowEditModal(false);
+          setEditingQuestionId(null); // Reset ID sau khi cập nhật
+        }}
+      />
 
     </div>
-    
+
   );
 };
 

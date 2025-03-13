@@ -13,6 +13,7 @@ function Main({ user, setUser, showAuthForm, setShowAuthForm, handleLogin, handl
   useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user)); // Lưu thông tin người dùng
+      console.log("user", user)
     }
     localStorage.setItem("lastPath", location.pathname); // Lưu đường dẫn hiện tại
   }, [user, location.pathname]);
@@ -29,7 +30,7 @@ function Main({ user, setUser, showAuthForm, setShowAuthForm, handleLogin, handl
       {/* Các Routes */}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/users" element={user ? <Users /> : <Navigate to="/" />} />
+        <Route path="/users" element={user?.role_id === "2" ? <Users /> : <Navigate to="/" />} />
         <Route path="/teacher" element={user?.role_id === "1" ? <Teacher /> : <Navigate to="/" />} />
       </Routes>
 

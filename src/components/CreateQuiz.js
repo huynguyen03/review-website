@@ -45,6 +45,9 @@ const SortableItem = ({ question, onEdit, onRemove }) => {
 const CreateQuiz = ({ teacherId, onQuizCreated }) => {
   const [quizName, setQuizName] = useState("");
   const [timeLimit, setTimeLimit] = useState("");
+  const [isPasswordProtected, setIsPasswordProtected] = useState(false); // Bật/Tắt mật khẩu
+  const [password, setPassword] = useState(""); // Lưu mật khẩu
+  const [isPublic, setIsPublic] = useState(true); // Trạng thái public/private
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [categories, setCategories] = useState([]); // Lưu danh mục câu hỏi
@@ -105,7 +108,10 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
       teacher_id: localStorage.getItem("user_id"), // Lưu ID người tạo bài thi
       selected_questions: selectedQuestions,
       questions_matrix: matrix,
-      is_Random_Question: isRandomQuestion
+      is_Random_Question: isRandomQuestion,
+      is_password_protected: isPasswordProtected, // Truyền trạng thái mật khẩu
+      password: isPasswordProtected ? password : null, // Chỉ gửi mật khẩu nếu bật
+      is_public: isPublic, // Truyền trạng thái public/private
     };
 
     try {
@@ -214,6 +220,57 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
             </Form.Group>
           </Col>
         </Row>
+        {/* Bật/Tắt mật khẩu bài thi */}
+        <Row className="mb-3">
+          <Col md={6}>
+            <Form.Check
+              type="checkbox"
+              label="Bảo vệ bằng mật khẩu"
+              checked={isPasswordProtected}
+              onChange={() => setIsPasswordProtected(!isPasswordProtected)}
+            />
+          </Col>
+          {isPasswordProtected && (
+            <Col md={6}>
+              <Form.Group controlId="password">
+                <Form.Label>Mật khẩu</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Nhập mật khẩu"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required={isPasswordProtected}
+                />
+              </Form.Group>
+            </Col>
+          )}
+        </Row>
+
+        {/* Chọn trạng thái Public/Private */}
+        <Row className="mb-3">
+          <Col md={6}>
+            <Form.Group>
+              <Form.Label>Trạng thái bài thi</Form.Label>
+              <div>
+                <Form.Check
+                  inline
+                  label="Công khai (Public)"
+                  type="radio"
+                  checked={isPublic}
+                  onChange={() => setIsPublic(true)}
+                />
+                <Form.Check
+                  inline
+                  label="Riêng tư (Private)"
+                  type="radio"
+                  checked={!isPublic}
+                  onChange={() => setIsPublic(false)}
+                />
+              </div>
+            </Form.Group>
+          </Col>
+        </Row>
+      
       </Form>
 
       <Row className="mb-3">

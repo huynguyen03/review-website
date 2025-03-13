@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, Row, Col } from "react-bootstrap";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-const StudentExams = ({ studentId }) => {
+import ExamSimulation from "./ExamSimulation";
+
+
+
+const StudentExams = ({ userId }) => {
+    const [selectedExam, setSelectedExam] = useState(null); // Chọn bài thi
+  
   const [publicExams, setPublicExams] = useState([]); // Bài thi công khai
   const [enrolledExams, setEnrolledExams] = useState([]); // Bài thi đã tham gia
-  const navigate = useNavigate();
 
   // Lấy danh sách bài thi công khai
   useEffect(() => {
@@ -25,7 +29,7 @@ const StudentExams = ({ studentId }) => {
   useEffect(() => {
     const fetchEnrolledExams = async () => {
       try {
-        const response = await axios.get(`http://localhost/react_api/fetch_completed_exams.php?user_id=${studentId}`);
+        const response = await axios.get(`http://localhost/react_api/fetch_completed_exams.php?user_id=${userId}`);
         if (Array.isArray(response.data)) {
           setEnrolledExams(response.data);
         }
@@ -34,45 +38,15 @@ const StudentExams = ({ studentId }) => {
       }
     };
 
-    if (studentId) {
+    if (userId) {
       fetchEnrolledExams();
     }
-  }, [studentId]);
+  }, [userId]);
 
-  // Tham gia bài thi công khai
-  const handleJoinExam = async (examId) => {
-    if (!studentId || !examId) {
-      alert("Lỗi: Thiếu thông tin học sinh hoặc bài thi!");
-      return;
-    }
 
-    try {
-      const response = await axios.post("http://localhost/react_api/join_exam.php", {
-        student_id: studentId,
-        exam_id: examId,
-      });
-
-      if (response.data.success) {
-        alert("Bạn đã đăng ký bài thi thành công!");
-
-        // Cập nhật danh sách bài thi đã tham gia để đổi nút thành "Vào bài thi"
-        const joinedExam = publicExams.find((exam) => exam.exam_id === examId);
-        setEnrolledExams((prev) => [...prev, joinedExam]);
-
-        // Loại bỏ bài thi khỏi danh sách công khai
-        setPublicExams((prev) => prev.filter((exam) => exam.exam_id !== examId));
-      }
-    } catch (error) {
-      console.error("Lỗi khi đăng ký bài thi!", error);
-      alert(error.response?.data?.error || "Không thể đăng ký bài thi!");
-    }
-  };
-
-  // Vào bài thi (chuyển trang)
-  const handleEnterExam = (examId) => {
-    navigate(`/exam/${examId}`);
-  };
-
+  if (selectedExam) {
+    return <ExamSimulation exam={selectedExam} studentId={userId} onBack={() => setSelectedExam(null)} />;
+  }
   return (
     <div>
       <h2>Bài thi công khai</h2>
@@ -89,8 +63,8 @@ const StudentExams = ({ studentId }) => {
                   <Card.Title>{exam.exam_name}</Card.Title>
                   <Card.Subtitle className="mb-2 text-muted">Thời gian: {exam.time_limit} phút</Card.Subtitle>
                   <Card.Text>Ngày tạo: {new Date(exam.created_at).toLocaleString()}</Card.Text>
-                  <Button variant="info" onClick={() => handleJoinExam(exam.exam_id)}>
-                    Đăng ký bài thi
+                  <Button variant="info" onClick={() => setSelectedExam(exam)}>
+                    Vào bài thi
                   </Button>
                 </Card.Body>
               </Card>
@@ -113,7 +87,7 @@ const StudentExams = ({ studentId }) => {
                   <Card.Title>{exam.exam_name}</Card.Title>
                   <Card.Subtitle className="mb-2 text-muted">Thời gian: {exam.time_limit} phút</Card.Subtitle>
                   <Card.Text>Ngày tham gia: {new Date(exam.enrolled_at).toLocaleString()}</Card.Text>
-                  <Button variant="primary" onClick={() => handleEnterExam(exam.exam_id)}>
+                  <Button variant="primary" onClick={() => setSelectedExam(exam)}>
                     Vào bài thi
                   </Button>
                 </Card.Body>

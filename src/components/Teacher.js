@@ -21,6 +21,7 @@ const Teacher = () => {
   const searchParams = new URLSearchParams(location.search);
   const activeSection = searchParams.get("section") || "home";
 
+
   const renderSection = () => {
     switch (activeSection) {
       case "home":
@@ -28,7 +29,7 @@ const Teacher = () => {
 
       case "my_quiz":
         return !isCreatingQuiz ? (
-          <QuizList onCreateQuiz={() => setIsCreatingQuiz(true)} userRole="teacher" />
+          <QuizList onCreateQuiz={() => setIsCreatingQuiz(true)} userRole={user.role_id} userId={user.user_id} />
         ) : (
           <div>
             <Button variant="secondary" className="mb-3" onClick={() => setIsCreatingQuiz(false)}>
@@ -39,7 +40,7 @@ const Teacher = () => {
         );
 
       case "manage_classrooms":
-        return <ManageClassroms teacherId={user.user_id} />;
+        return <ManageClassroms teacherId={user.user_id} userId={user.role_id}/>;
 
       case "question_bank":
         return (
@@ -57,7 +58,7 @@ const Teacher = () => {
   return (
     <QuestionProvider>
       <div className="d-flex">
-        <Sidebar />
+        <Sidebar roleId={user.role_id}/>
         <div className="content flex-grow-1 p-3" style={{ marginLeft: "250px" }}>
           <Headercontent />
           {renderSection()}

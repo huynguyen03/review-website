@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect,useCallback  } from "react";
 import { Container, Button, Form, Spinner, Table, Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faEdit, faPlus } from "@fortawesome/free-solid-svg-icons";
-import EditQuestion from "./EditQuestion"; // Import giao diện chỉnh sửa câu hỏi
+import { faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
 
-const QuizSettings = ({ examId, onBack }) => {
-  const navigate = useNavigate();
-  const [quizData, setQuizData] = useState(null);
+const QuizSettings = ({ examId, onBack , userId}) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [questions, setQuestions] = useState([]);
@@ -19,7 +15,6 @@ const QuizSettings = ({ examId, onBack }) => {
 
   const [showModal, setShowModal] = useState(false); // Modal thêm câu hỏi
   const [availableQuestions, setAvailableQuestions] = useState([]); // Ngân hàng câu hỏi
-  const [editingQuestionId, setEditingQuestionId] = useState(null);
 
   // 🔹 Lấy thông tin bài thi & danh sách câu hỏi
   useEffect(() => {
@@ -30,9 +25,9 @@ const QuizSettings = ({ examId, onBack }) => {
   // 🛑 Lấy thông tin bài thi
   const fetchQuizDetails = async () => {
     try {
-      const response = await fetch(`http://localhost/react_api/get_quiz.php?exam_id=${examId}`);
+      const response = await fetch(`http://localhost/react_api/get_quizz.php?exam_id=${examId}`);
       const data = await response.json();
-      setQuizData(data);
+      // setQuizData(data); DỮ liệu chưa cần đến
       setFormData({
         exam_name: data.exam_name || "",
         time_limit: data.time_limit || 30,
@@ -48,7 +43,16 @@ const QuizSettings = ({ examId, onBack }) => {
   // 🛑 Lấy danh sách câu hỏi đã thêm vào bài thi
   const fetchExamQuestions = async () => {
     try {
-      const response = await fetch(`http://localhost/react_api/get_exam_questions.php?exam_id=${examId}`);
+    
+      const response = await fetch(`http://localhost/react_api/fetch_exam_questions.php?exam_id=${examId}`, {
+
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({teacder_id: userId}),
+      }
+      );
       const data = await response.json();
       setQuestions(data);
     } catch (error) {
@@ -59,7 +63,7 @@ const QuizSettings = ({ examId, onBack }) => {
   // 🛑 Lấy danh sách câu hỏi từ ngân hàng câu hỏi
   const fetchAvailableQuestions = async () => {
     try {
-      const response = await fetch("http://localhost/react_api/fetch_questions.php");
+      const response = await fetch(`http://localhost/react_api/fetch_questions.php?teacher_id=${userId}`);
       const data = await response.json();
       setAvailableQuestions(data);
     } catch (error) {
@@ -172,9 +176,7 @@ const QuizSettings = ({ examId, onBack }) => {
           />
         </Form.Group>
 
-        <Button variant="primary" onClick={handleSave} disabled={saving}>
-          {saving ? "Đang lưu..." : "Lưu thay đổi"}
-        </Button>
+        
       </Form>
 
       <h3 className="mt-4">Danh sách câu hỏi</h3>
@@ -185,16 +187,23 @@ const QuizSettings = ({ examId, onBack }) => {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>Câu Hỏi</th>
             <th>Loại</th>
+            <th>Câu Hỏi</th>
+            <th>Đáp án</th>
             <th>Thao tác</th>
+            <th>Mức độ</th>
+
           </tr>
         </thead>
         <tbody>
           {questions.map((q) => (
             <tr key={q.question_id}>
-              <td>{q.question_title}</td>
               <td>{q.question_type}</td>
+              <td>{q.question_text}</td>
+              <td>{q.correct_answer_text}</td>
+              <td>{q.difficulty_level}</td>
+
+
               <td>
                 <Button variant="danger" size="sm" onClick={() => handleRemoveQuestion(q.question_id)}>
                   <FontAwesomeIcon icon={faTrash} /> Xóa
@@ -204,6 +213,10 @@ const QuizSettings = ({ examId, onBack }) => {
           ))}
         </tbody>
       </Table>
+
+      <Button variant="primary" onClick={handleSave} disabled={saving}>
+          {saving ? "Đang lưu..." : "Lưu thay đổi"}
+        </Button>
 
       {/* Modal thêm câu hỏi */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
