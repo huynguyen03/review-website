@@ -1,44 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
-import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Table, Container, Row, Col, Button, Modal, InputGroup, FormControl, Form } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsAlt, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import SortableItem from "./SortableItem"
 
-import EditQuestion from "./EditQuestion";  // Import EditQuestion
 import RandomQuestionSelector from "./RandomQuestionSelector";  // Import EditQuestion
 
 
 
-const SortableItem = ({ question, onEdit, onRemove }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: question.question_id });
+// const SortableItem = ({ question, onEdit, onRemove }) => {
+//   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: question.question_id });
 
-  const style = {
-    transform: transform ? `translateY(${transform.y}px)` : undefined,
-    transition,
-  };
+//   const style = {
+//     transform: transform ? `translateY(${transform.y}px)` : undefined,
+//     transition,
+//   };
 
-  return (
-    <tr ref={setNodeRef} style={style}>
-      <td style={{ width: "40px", textAlign: "center", cursor: "grab" }} {...attributes} {...listeners}>
-        <FontAwesomeIcon icon={faArrowsAlt} />
-      </td>
-      <td>{question.question_type}</td>
-      <td>{question.question_title}</td>
-      <td>{question.answer_options?.[question.correct_answer_index] || "N/A"}</td>
-      <td>{question.status}</td>
-      <td>{new Date(question.updated_at).toLocaleDateString()}</td>
-      <td>
-        <Button variant="warning" size="sm" onClick={() => onEdit(question.question_id)}>
-          <FontAwesomeIcon icon={faEdit} /> Chỉnh sửa
-        </Button>{" "}
-        <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); onRemove(question.question_id); }}>
-          <FontAwesomeIcon icon={faTrash} /> Gỡ
-        </Button>
-      </td>
-    </tr>
-  );
-};
+//   return (
+//     <tr ref={setNodeRef} style={style}>
+//       <td style={{ width: "40px", textAlign: "center", cursor: "grab" }} {...attributes} {...listeners}>
+//         <FontAwesomeIcon icon={faArrowsAlt} />
+//       </td>
+//       <td>{question.question_type}</td>
+//       <td>{question.question_title}</td>
+//       <td>{question.answer_options?.[question.correct_answer_index] || "N/A"}</td>
+//       <td>{question.score}</td>
+
+//       <td>{question.status}</td>
+//       <td>{new Date(question.updated_at).toLocaleDateString()}</td>
+//       <td>
+//         <Button variant="warning" size="sm" onClick={() => onEdit(question.question_id)}>
+//           <FontAwesomeIcon icon={faEdit} /> Chỉnh sửa
+//         </Button>{" "}
+//         <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); onRemove(question.question_id); }}>
+//           <FontAwesomeIcon icon={faTrash} /> Gỡ
+//         </Button>
+//       </td>
+//     </tr>
+//   );
+// };
 
 
 
@@ -138,12 +138,20 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
       alert("Đã xảy ra lỗi khi lưu bài thi.");
     }
   }
+// Hàm tự cài đặt để di chuyển phần tử trong mảng
+const arrayMove = (array, fromIndex, toIndex) => {
+  const result = [...array];
+  const [movedItem] = result.splice(fromIndex, 1);  // Xóa phần tử ở vị trí fromIndex
+  result.splice(toIndex, 0, movedItem);  // Thêm phần tử đã xóa vào vị trí toIndex
+  return result;
+};
 
   const handleQuestionSelect = (question) => {
     setSelectedQuestions((prev) => {
       const alreadySelected = prev.some((q) => q.question_id === question.question_id);
       return alreadySelected ? prev.filter((q) => q.question_id !== question.question_id) : [...prev, question];
     });
+    console.log("Câu hỏi khi được chọn: ", selectedQuestions)
   };
 
   const handleDragEnd = (event) => {
@@ -177,20 +185,33 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
 
 
   // Mở modal chỉnh sửa khi nhấn "Chỉnh sửa"
-  const handleEditQuestion = (questionId) => {
-    setEditingQuestionId(questionId);
-  };
-
+// Hàm chỉnh sửa câu hỏi
+const handleEditQuestion = (updatedQuestion) => {
   // Cập nhật câu hỏi sau khi chỉnh sửa
-  const handleQuestionUpdated = (updatedQuestion) => {
-    setSelectedQuestions((prev) =>
-      prev.map((q) => (q.question_id === updatedQuestion.question_id ? updatedQuestion : q))
-    );
-    setEditingQuestionId(null); // Đóng modal sau khi cập nhật
-  };
+  setQuestions((prevQuestions) =>
+    prevQuestions.map((question) =>
+      question.question_id === updatedQuestion.question_id
+        ? updatedQuestion
+        : question
+    )
+  );
+};
+
+  // Hàm hiển thị modal chỉnh sửa câu hỏi
+  // const handleShowModal = (questionId) => {
+  //   setEditingQuestionId(questionId);  // Lưu ID câu hỏi vào trạng thái
+  // };
+
+  // // Cập nhật câu hỏi sau khi chỉnh sửa
+  // const handleQuestionUpdated = (updatedQuestion) => {
+  //   setSelectedQuestions((prev) =>
+  //     prev.map((q) => (q.question_id === updatedQuestion.question_id ? updatedQuestion : q))
+  //   );
+  //   setEditingQuestionId(null); // Đóng modal sau khi cập nhật
+  // };
 
   return (
-    <Container>
+    <Container className="container-full-width">
       <h2 className="mt-4">Tạo Bài Thi</h2>
 
       <Form>
@@ -315,6 +336,7 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
                 <th>Loại Câu Hỏi</th>
                 <th>Câu Hỏi</th>
                 <th>Đáp Án Đúng</th>
+                <th>Điểm</th>
                 <th>Trạng Thái</th>
                 <th>Ngày Cập Nhật</th>
               </tr>
@@ -335,6 +357,8 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
                   <td>{question.question_type}</td>
                   <td>{question.question_title}</td>
                   <td>{question.answer_options?.[question.correct_answer_index] || "N/A"}</td>
+                  <td>{question.score}</td>
+            
                   <td>{question.status}</td>
                   <td>{new Date(question.updated_at).toLocaleDateString()}</td>
                 </tr>
@@ -351,23 +375,28 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
             <Table striped bordered hover>
               <thead>
                 <tr>
-                  <th style={{ width: "40px", textAlign: "center" }}>☰</th>
-                  <th>Loại Câu Hỏi</th>
-                  <th>Câu Hỏi</th>
-                  <th>Đáp Án Đúng</th>
-                  <th>Trạng Thái</th>
-                  <th>Ngày Cập Nhật</th>
-                  <th>Thao Tác</th> {/* Không kéo thả */}
+                  <th style={{ width: "3%", textAlign: "center" }}>☰</th>
+                  <th style={{ width: "10%" }}>Loại Câu Hỏi</th>
+                  <th style={{ width: "15%" }}>Câu Hỏi</th>
+                  <th style={{ width: "20%" }}>Đáp Án Đúng</th>
+                  <th style={{ width: "7%" }}>Điểm</th>
+
+                  <th style={{ width: "7%" }}>Trạng Thái</th>
+                  <th style={{ width: "7%" }}>Ngày Cập Nhật</th>
+                  <th style={{ width: "10%" }}>Thao Tác</th> {/* Không kéo thả */}
                 </tr>
               </thead>
               <tbody>
                 {selectedQuestions.map((question) => (
                   <SortableItem
-                    key={question.question_id}
-                    question={question}
-                    onEdit={handleEditQuestion}
-                    onRemove={handleRemoveQuestion}
-                  />
+                  key={question.question_id}
+              question={question}
+              onEdit={handleEditQuestion}  // Truyền hàm chỉnh sửa từ cha
+              onRemove={handleRemoveQuestion}  // Truyền hàm xóa từ cha
+              teacherId={1}  // Giả sử teacherId là 1
+                >
+                  
+                </SortableItem>
                 ))}
               </tbody>
             </Table>
@@ -383,16 +412,16 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
 </Button>
 
 
-      {/* Hiển thị modal chỉnh sửa nếu có câu hỏi cần chỉnh sửa */}
+      {/* Hiển thị modal chỉnh sửa nếu có câu hỏi cần chỉnh sửa
       {editingQuestionId && (
         <EditQuestion
-          show={!!editingQuestionId}
-          onHide={() => setEditingQuestionId(null)}
-          questionId={editingQuestionId}
-          teacherId={teacherId}
-          onQuestionUpdated={handleQuestionUpdated}
+        show={!!editingQuestionId}
+        onHide={() => setEditingQuestionId(null)}  // Đóng modal
+        questionId={editingQuestionId}
+        teacherId={1}  // Giả sử teacherId là 1
+        onQuestionUpdated={handleEditQuestion}  // Gọi hàm cập nhật câu hỏi từ cha
         />
-      )}
+      )} */}
     </Container>
   );
 };

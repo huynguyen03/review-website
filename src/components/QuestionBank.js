@@ -179,7 +179,7 @@ const QuestionBank = ({ teacherId }) => {
 
 
       {filteredQuestions.length > 0 ? (
-        <table className="table table-striped table-responsive" style={{ tableLayout: "fixed" }}>
+        <table className="table table-striped table-responsive table-bordered"  style={{ tableLayout: "fixed", width: "100%"}}>
           <thead>
             <tr>
               <th style={{ width: "2%" }}>
@@ -196,12 +196,14 @@ const QuestionBank = ({ teacherId }) => {
                 />
               </th>
               <th style={{ width: "10%" }}>Loại câu hỏi</th>
-              <th style={{ width: "25%" }}>Nội dung</th>
+              <th style={{ width: "35%" }}>Nội dung</th>
               <th style={{ width: "15%" }}>Các đáp án để lựa chọn</th>
               <th style={{ width: "15%" }}>Đáp án đúng</th>
-              <th style={{ width: "7%" }}>Độ khó</th>
-              <th style={{ width: "10%" }}>Trạng thái</th>
-              <th style={{ width: "10%" }}>Ngày cập nhật</th>
+              <th style={{ width: "5%" }} class="text-center">Điểm</th>
+
+              <th style={{ width: "7%" }} class="text-center">Độ khó</th>
+              <th style={{ width: "7%" }} class="text-center">Trạng thái </th>
+              <th style={{ width: "8%" }}>Ngày cập nhật</th>
             </tr>
           </thead>
           <tbody>
@@ -236,9 +238,10 @@ const QuestionBank = ({ teacherId }) => {
                 </td>
 
                 <td>{question.correct_answer_text}</td>
-                <td>{question.difficulty_level}</td>
-                <td>{question.status}</td>
-                <td>{new Date(question.updated_at).toLocaleDateString()}</td>
+                <td class="text-center">{question.score}</td>
+                <td class="text-center">{question.difficulty_level}</td>
+                <td class="text-center">{question.status}</td>
+                <td class="text-center">{new Date(question.updated_at).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>

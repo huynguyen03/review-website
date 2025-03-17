@@ -23,7 +23,7 @@ const Users = () => {
   const renderSection = () => {
     switch (activeSection) {
       case "home":
-        return <HomePage userId={user.user_id} />
+        return <HomePage userId={user.user_id} roleId={user.role_id}/>
           ;
 
       case "my_quiz":

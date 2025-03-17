@@ -1,9 +1,12 @@
-import React, { useState, useEffect,useCallback  } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Button, Form, Spinner, Table, Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import SortableItem from "./SortableItem";
 
-const QuizSettings = ({ examId, onBack , userId}) => {
+const QuizSettings = ({ examId, onBack, userId }) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [questions, setQuestions] = useState([]);
@@ -43,14 +46,14 @@ const QuizSettings = ({ examId, onBack , userId}) => {
   // 🛑 Lấy danh sách câu hỏi đã thêm vào bài thi
   const fetchExamQuestions = async () => {
     try {
-    
+
       const response = await fetch(`http://localhost/react_api/fetch_exam_questions.php?exam_id=${examId}`, {
 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({teacder_id: userId}),
+        body: JSON.stringify({ teacder_id: userId }),
       }
       );
       const data = await response.json();
@@ -143,6 +146,39 @@ const QuizSettings = ({ examId, onBack , userId}) => {
       console.error("Lỗi khi thêm câu hỏi:", error);
     }
   };
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    // ✅ Kiểm tra nếu `over` tồn tại, nếu không thì return sớm
+    if (!over) return;
+
+    if (active.id !== over.id) {
+      const oldIndex = questions.findIndex((q) => q.question_id === active.id);
+      const newIndex = questions.findIndex((q) => q.question_id === over.id);
+
+      // ✅ Kiểm tra nếu cả oldIndex và newIndex đều hợp lệ
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setQuestions(arrayMove(questions, oldIndex, newIndex));
+      }
+    }
+  };
+
+  const arrayMove = (array, fromIndex, toIndex) => {
+    const result = [...array];
+    const [movedItem] = result.splice(fromIndex, 1);  // Xóa phần tử ở vị trí fromIndex
+    result.splice(toIndex, 0, movedItem);  // Thêm phần tử đã xóa vào vị trí toIndex
+    return result;
+  };
+  const handleEditQuestion = (updatedQuestion) => {
+    // Cập nhật câu hỏi sau khi chỉnh sửa
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((question) =>
+        question.question_id === updatedQuestion.question_id
+          ? updatedQuestion
+          : question
+      )
+    );
+  };
 
   if (loading) {
     return (
@@ -176,7 +212,7 @@ const QuizSettings = ({ examId, onBack , userId}) => {
           />
         </Form.Group>
 
-        
+
       </Form>
 
       <h3 className="mt-4">Danh sách câu hỏi</h3>
@@ -184,39 +220,45 @@ const QuizSettings = ({ examId, onBack , userId}) => {
         <FontAwesomeIcon icon={faPlus} /> Thêm câu hỏi
       </Button>
 
-      <Table striped bordered hover>
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={questions.map((q) => q.question_id)} strategy={verticalListSortingStrategy}>
+                  <Table striped bordered hover>
         <thead>
           <tr>
-            <th>Loại</th>
-            <th>Câu Hỏi</th>
-            <th>Đáp án</th>
-            <th>Thao tác</th>
-            <th>Mức độ</th>
+            <th style={{ width: "3%", textAlign: "center" }}>☰</th>
+            <th style={{ width: "10%" }}>Loại Câu Hỏi</th>
+            <th style={{ width: "15%" }}>Câu Hỏi</th>
+            <th style={{ width: "20%" }}>Đáp Án Đúng</th>
+            <th style={{ width: "7%" }}>Điểm</th>
+
+            <th style={{ width: "7%" }}>Trạng Thái</th>
+            <th style={{ width: "7%" }}>Ngày Cập Nhật</th>
+            <th style={{ width: "10%" }}>Thao Tác</th> {/* Không kéo thả */}
 
           </tr>
         </thead>
         <tbody>
-          {questions.map((q) => (
-            <tr key={q.question_id}>
-              <td>{q.question_type}</td>
-              <td>{q.question_text}</td>
-              <td>{q.correct_answer_text}</td>
-              <td>{q.difficulty_level}</td>
 
 
-              <td>
-                <Button variant="danger" size="sm" onClick={() => handleRemoveQuestion(q.question_id)}>
-                  <FontAwesomeIcon icon={faTrash} /> Xóa
-                </Button>
-              </td>
-            </tr>
+          {questions.map((question) => (
+            <SortableItem
+              key={question.question_id}
+              question={question}
+              onEdit={handleEditQuestion}  // Truyền hàm chỉnh sửa từ cha
+              onRemove={handleRemoveQuestion}  // Truyền hàm xóa từ cha
+              teacherId={1}  // Giả sử teacherId là 1
+            >
+
+            </SortableItem>
           ))}
         </tbody>
       </Table>
+      </SortableContext>
+              </DndContext>
 
       <Button variant="primary" onClick={handleSave} disabled={saving}>
-          {saving ? "Đang lưu..." : "Lưu thay đổi"}
-        </Button>
+        {saving ? "Đang lưu..." : "Lưu thay đổi"}
+      </Button>
 
       {/* Modal thêm câu hỏi */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>

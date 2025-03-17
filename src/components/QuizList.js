@@ -69,7 +69,7 @@ const QuizList = ({ userRole, userId }) => {
   };
 
   return (
-    <Container fluid>
+    <Container fluid  className="container-full-width">
       <Row>
         {/* Nội dung chính */}
         <Col md={9}>
