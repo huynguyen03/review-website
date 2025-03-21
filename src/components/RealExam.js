@@ -22,11 +22,14 @@ const RealExam = ({ exam, studentId, onBack }) => {
   const [analysis, setAnalysis] = useState(null); // 🔹 Thêm state để lưu analysis từ ScoreCalculator
   const [isRandomExam, setIsRandomExam] = useState(false); // Trạng thái bài thi câu hỏi ngẫu nhiên
 
+
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
  
 // Hàm kiểm tra xem bài thi có lấy câu hỏi ngẫu nhiên không
 const checkExamType = useCallback(async () => {
   try {
-    const response = await fetch(`http://localhost/react_api/check_exam_type.php?exam_id=${exam.exam_id}`);
+    const response = await fetch(`${apiUrl}/check_exam_type.php?exam_id=${exam.exam_id}`);
     
     if (!response.ok) {
       throw new Error(`Lỗi kiểm tra kiểu bài thi: ${response.status}`);
@@ -43,7 +46,7 @@ const checkExamType = useCallback(async () => {
   // Hàm tải câu hỏi của bài thi (dùng cho cả bài thi thông thường và ngẫu nhiên)
   const fetchQuestions = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost/react_api/fetch_exam_questions.php?exam_id=${exam.exam_id}`);
+      const response = await fetch(`${apiUrl}/fetch_exam_questions.php?exam_id=${exam.exam_id}`);
       
       if (!response.ok) {
         throw new Error(`Lỗi tải câu hỏi: ${response.status}`);
@@ -59,7 +62,7 @@ const checkExamType = useCallback(async () => {
 // Hàm lấy câu hỏi ngẫu nhiên nếu bài thi có lấy câu hỏi từ ngân hàng
 const fetchRandomQuestions = useCallback(async () => {
   try {
-    const response = await fetch(`http://localhost/react_api/fetch_random_questions.php?exam_id=${exam.exam_id}`);
+    const response = await fetch(`${apiUrl}/fetch_random_questions.php?exam_id=${exam.exam_id}`);
     
     if (!response.ok) {
       throw new Error(`Lỗi khi lấy câu hỏi ngẫu nhiên: ${response.status}`);
@@ -83,7 +86,7 @@ const fetchRandomQuestions = useCallback(async () => {
   const sendExamResult = useCallback(async (scoreDetails) => { 
     if (isResultSent || !scoreDetails) return;
     try {
-      const response = await fetch("http://localhost/react_api/submit_exam_result.php", {
+      const response = await fetch(`${apiUrl}/submit_exam_result.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

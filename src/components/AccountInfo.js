@@ -16,11 +16,13 @@ const AccountInfo = ({ show, onHide, userId }) => {
   const [passwordError, setPasswordError] = useState("");
   const [currentPasswordError, setCurrentPasswordError] = useState("");
 
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
   // Lấy thông tin người dùng khi modal mở
   useEffect(() => {
     if (show) {
       axios
-        .get(`http://localhost/react_api/get_user_info.php?user_id=${userId}`)
+        .get(`${apiUrl}/get_user_info.php?user_id=${userId}`)
         .then((response) => {
           const { username, email } = response.data;
           setUserData({ username, email, password: "", newPassword: "", confirmPassword: "" });
@@ -37,7 +39,7 @@ const AccountInfo = ({ show, onHide, userId }) => {
     // Kiểm tra mật khẩu cũ
     if (userData.password) {
       axios
-        .post("http://localhost/react_api/verify_password.php", {
+        .post(`${apiUrl}/verify_password.php`, {
           user_id: userId,
           password: userData.password, // Mã hóa mật khẩu cũ
         })
@@ -47,7 +49,7 @@ const AccountInfo = ({ show, onHide, userId }) => {
               const updatedData = { ...userData };
 
               axios
-                .post("http://localhost/react_api/update_user_info.php", {
+                .post("${apiUrl}/update_user_info.php", {
                   user_id: userId,
                   username: userData.username,
                   email: userData.email,

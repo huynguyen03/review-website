@@ -17,12 +17,13 @@ ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend)
 
 const ExamStatistics = ({ examId }) => {
   const [examData, setExamData] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     const fetchExamData = async () => {
       try {
         const response = await fetch(
-          `http://localhost/react_api/fetch_exam_results.php?exam_id=${examId}`
+          `${apiUrl}/fetch_exam_results.php?exam_id=${examId}`
         );
         const data = await response.json();
         setExamData(data);

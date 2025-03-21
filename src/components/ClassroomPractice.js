@@ -3,6 +3,10 @@ import React, { useState, useEffect, useCallback } from "react";
 
 import { Button, Card, Row, Col, Modal, Form, Spinner } from "react-bootstrap";
 import axios from "axios";
+import defaultExamImafe from "../assets/images/logo/logo_transparent_blue.png";
+
+import LearningProcess from "./LearningProcess";
+
 import ExamSimulation from "./ExamSimulation";
 import ExamStatistics from "./ExamStatistics";
 
@@ -11,7 +15,7 @@ import ExamStatistics from "./ExamStatistics";
 const ClassroomPractice = ({ classroomId, userId, roleId }) => {
   const [publicExams, setPublicExams] = useState([]); // Danh sách bài thi đã tạo
   const [examsClassrom, setExamsClassrom] = useState([]); // Danh sách bài thi đã thêm vào lớp học
-  const [showModal, setShowModal] = useState(false);
+  const [showModalLearnningProcess, setShowModalLearnningProcess] = useState(false);
   const [showExamSimulation, setShowExamSimulation] = useState(false);
   const [exerciseTitle, setExerciseTitle] = useState("");
   const [exerciseContent, setExerciseContent] = useState("");
@@ -20,6 +24,7 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
   const [showStats, setShowStats] = useState(false);// quản lý hiển thị thống kê điểm số
   const [loading, setLoading] = useState(false);
 
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 
   // Fetch danh sách bài thi đã tạo từ API
@@ -28,7 +33,7 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
     try {
 
       const response = await fetch(
-        `http://localhost/react_api/fetch_completed_exams.php?user_id=${userId}`
+        `${apiUrl}/fetch_completed_exams.php?user_id=${userId}`
       );
       const data = await response.json();
       setPublicExams(data); // Cập nhật bài thi đã tạo
@@ -46,7 +51,7 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
     setLoading(true)
     try {
       const response = await axios.get(
-        `http://localhost/react_api/fetch_classroom_exams.php?classroom_id=${classroomId}`
+        `${apiUrl}/fetch_classroom_exams.php?classroom_id=${classroomId}`
       );
       setExamsClassrom(response.data || []); // Cập nhật bài thi đã thêm vào lớp học
       console.log("Các bài thi có trong lớp học", response.data)
@@ -70,7 +75,7 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
     setLoading(true)
     if (!examId) return;
     try {
-      await axios.post("http://localhost/react_api/add_exam_to_classroom.php", {
+      await axios.post(`${apiUrl}/add_exam_to_classroom.php`, {
         classroom_id: classroomId,
         exam_id: examId,
       });
@@ -90,7 +95,7 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
     if (!window.confirm("Bạn có chắc muốn xóa bài thi này khỏi lớp học?")) return;
 
     try {
-      await axios.post("http://localhost/react_api/delete_exam_from_classroom.php", {
+      await axios.post(`${apiUrl}/delete_exam_from_classroom.php`, {
         classroom_id: classroomId,
         exam_id: examId,
       });
@@ -113,12 +118,16 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
     setShowStats(true);
   }
 
-
+  const hanldeShowLearnningProcess = () => {
+    console.log("Đã chọn tọa tiến trình bài thi");
+    setShowModalLearnningProcess(true)
+    
+  }
   if (selectedExam && showExamSimulation) {
     return <ExamSimulation exam={selectedExam} studentId={userId} onBack={() => setSelectedExam(null)} />;
   }
   return (
-    <div>
+    <div className="">
       {loading ? (
         <div className="text-center mt-5">
           <Spinner animation="border" />
@@ -130,7 +139,6 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
       ) : (
 
         <>
-          <h3>Bài ôn luyện trong lớp</h3>
           {
             roleId === "2" ? (
               <>
@@ -138,9 +146,11 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
                 <Row>
                   {examsClassrom.length > 0 ? (
                     examsClassrom.map((exam) => (
-                      <Col key={exam.exam_id} md={6} className="mb-3">
+                      <Col key={exam.exam_id} md={6} className="mb-3 ">
                         <Card>
                           <Card.Body>
+                          <Card.Img variant="top" src={exam.image_url || defaultExamImafe} className="card-image" />
+
                             <Card.Title>{exam.exam_name}</Card.Title>
                             {/* Điều hướng sang giao diện thi thử */}
                             <Button
@@ -162,29 +172,35 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
               </>
 
             ) : (
-              <>
-                <Button variant="primary" className="mb-3" onClick={() => setShowModal(true)}>
-                  + Thêm bài ôn luyện
-                </Button>
+              <div style={{marfin_bottom: "32px"}}>
+                
+                {/* Hiển thị các bài thi đã thêm vào lớp học */}
+                <h3 className='h3-header '>Thêm bài thi vào lớp học</h3>
+                <div className='d-flex gap-2 '>
+                <h4>Bài thi đã thêm vào lớp học</h4>
                 <Button variant="secondary" className="mb-3" onClick={() => setShowExamModal(true)}>
                   + Thêm bài thi đã tạo
                 </Button>
-                {/* Hiển thị các bài thi đã thêm vào lớp học */}
-                <h4>Bài thi đã thêm vào lớp học</h4>
+                </div>
                 <Row>
                   {examsClassrom.length > 0 ? (
                     examsClassrom.map((exam) => (
-                      <Col key={exam.exam_id} md={6} className="mb-3">
+                      <Col key={exam.exam_id} md={3} className="mb-3">
                         <Card>
                           <Card.Body>
+                          <Card.Img variant="top" src={exam.image_url || defaultExamImafe} className="card-image" />
+
                             <Card.Title>{exam.exam_name}</Card.Title>
-                            <Button variant="primary" onClick={() => hanldeShowExamStatistics(exam)}>📊 Thống kê điểm số</Button>
+                            <div className="d-flex justify-content-between">
+
+                            <Button className="px-3" variant="primary" onClick={() => hanldeShowExamStatistics(exam)}>📊 Thống kê điểm số</Button>
                             <Button
                               variant="danger"
                               onClick={() => handleDeleteExamFromClassroom(exam.exam_id)}
                             >
-                              Xóa bài thi khỏi lớp học
+                              Gỡ bài thi
                             </Button>
+                            </div>
                           </Card.Body>
                         </Card>
                       </Col>
@@ -194,36 +210,10 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
                   )}
                 </Row>
 
-                {/* Modal thêm bài ôn luyện */}
-                <Modal show={showModal} onHide={() => setShowModal(false)}>
-                  <Modal.Header closeButton>
-                    <Modal.Title>Thêm bài ôn luyện</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                    <Form>
-                      <Form.Group controlId="exerciseTitle">
-                        <Form.Label>Tiêu đề bài ôn luyện</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={exerciseTitle}
-                          onChange={(e) => setExerciseTitle(e.target.value)}
-                        />
-                      </Form.Group>
+                {/* Hiển thị LearningProcess khi showLearningProcess là true */}
 
-                      <Form.Group controlId="exerciseContent">
-                        <Form.Label>Nội dung bài ôn luyện</Form.Label>
-                        <Form.Control
-                          as="textarea"
-                          rows={4}
-                          value={exerciseContent}
-                          onChange={(e) => setExerciseContent(e.target.value)}
-                        />
-                      </Form.Group>
-
-                      <Button variant="primary">Thêm bài ôn luyện</Button>
-                    </Form>
-                  </Modal.Body>
-                </Modal>
+      <LearningProcess userId={userId} />
+                
 
                 {/* Modal thêm bài thi đã tạo */}
                 <Modal show={showExamModal} onHide={() => setShowExamModal(false)}>
@@ -254,7 +244,7 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
                     </Row>
                   </Modal.Body>
                 </Modal>
-              </>
+              </div>
             )
           }
         </>

@@ -12,6 +12,8 @@ const UploadFileQuestion = ({ teacherId }) => {
   const [showModal, setShowModal] = useState(false); // Điều khiển modal
   const [loading, setLoading] = useState(false); // Kiểm soát trạng thái tải lên
 
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
   // 🔹 Fetch danh mục khi component mount
   useEffect(() => {
     fetchCategories();
@@ -19,7 +21,7 @@ const UploadFileQuestion = ({ teacherId }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost/react_api/get_categories.php");
+      const response = await fetch(`${apiUrl}/get_categories.php`);
       const data = await response.json();
       setCategories(data); // Cập nhật danh mục
     } catch (error) {
@@ -54,7 +56,7 @@ const UploadFileQuestion = ({ teacherId }) => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost/react_api/upload.php", {
+      const response = await fetch(`${apiUrl}/upload.php`, {
         method: "POST",
         body: formData,
       });
@@ -100,7 +102,7 @@ const UploadFileQuestion = ({ teacherId }) => {
     }
   
     try {
-      const response = await fetch("http://localhost/react_api/add_category.php", {
+      const response = await fetch(`${apiUrl}/add_category.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

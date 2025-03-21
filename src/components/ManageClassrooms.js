@@ -16,12 +16,14 @@ const ManageClassrooms = ({ teacherId, roleId }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [members, setMembers] = useState([]);
 
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate();
   // ✅ Lấy danh sách lớp học
   const fetchClassrooms = useCallback(async () => {
     if (!teacherId) return;
     try {
-      const response = await axios.get(`http://localhost/react_api/fetch_my_classrooms.php?user_id=${teacherId}`);
+      const response = await axios.get(`${apiUrl}/fetch_my_classrooms.php?user_id=${teacherId}`);
       setClassrooms(response.data);
     } catch (error) {
       console.error("❌ Lỗi lấy danh sách lớp học:", error);
@@ -35,7 +37,7 @@ const ManageClassrooms = ({ teacherId, roleId }) => {
   // ✅ Lấy danh sách thành viên của lớp
   const fetchMembers = async (classroomId) => {
     try {
-      const response = await axios.get(`http://localhost/react_api/fetch_members.php?classroom_id=${classroomId}`);
+      const response = await axios.get(`${apiUrl}/fetch_members.php?classroom_id=${classroomId}`);
       setMembers(response.data);
     } catch (error) {
       console.error("❌ Lỗi lấy danh sách thành viên:", error);
@@ -63,7 +65,7 @@ const handleEnterClassroom = (classroom) => {
     // if (!selectedClassroom) return;
 
     try {
-      await axios.post(`http://localhost/react_api/update_classroom.php`, {
+      await axios.post(`${apiUrl}/update_classroom.php`, {
         classroom_id: selectedClassroom.classroom_id,
         class_name: className,
         registration_password: registrationPassword,
@@ -94,7 +96,7 @@ const handleCreateClass = async () => {
 
   try {
     // Gửi yêu cầu tạo lớp học
-    const response = await axios.post(`http://localhost/react_api/create_classroom.php`, {
+    const response = await axios.post(`${apiUrl}/create_classroom.php`, {
       class_name: className,
       teacher_id: teacherId,
     });
@@ -114,7 +116,7 @@ const handleCreateClass = async () => {
   // ✅ Xử lý xóa thành viên
   const handleKickMember = async (studentId) => {
     try {
-      await axios.post(`http://localhost/react_api/kick_members.php`, {
+      await axios.post(`${apiUrl}/kick_members.php`, {
         classroom_id: selectedClassroom.classroom_id,
         student_id: studentId,
       });
@@ -133,10 +135,8 @@ const handleCreateClass = async () => {
   };
 
   return (
-    <div>
-      <Button variant="secondary" onClick={handleBackToList} className="mb-3">
-        ← Quay lại
-      </Button>
+    <div >
+      
 
 
       {/* Danh sách lớp học */}

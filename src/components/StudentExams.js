@@ -11,12 +11,14 @@ const StudentExams = ({ userId }) => {
   
   const [publicExams, setPublicExams] = useState([]); // Bài thi công khai
   const [enrolledExams, setEnrolledExams] = useState([]); // Bài thi đã tham gia
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
 
   // Lấy danh sách bài thi công khai
   useEffect(() => {
     const fetchPublicExams = async () => {
       try {
-        const response = await axios.get("http://localhost/react_api/fetch_public_exams.php");
+        const response = await axios.get(`${apiUrl}/fetch_public_exams.php`);
         setPublicExams(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách bài thi công khai!", error);
@@ -29,7 +31,7 @@ const StudentExams = ({ userId }) => {
   useEffect(() => {
     const fetchEnrolledExams = async () => {
       try {
-        const response = await axios.get(`http://localhost/react_api/fetch_completed_exams.php?user_id=${userId}`);
+        const response = await axios.get(`${apiUrl}/fetch_completed_exams.php?user_id=${userId}`);
         if (Array.isArray(response.data)) {
           setEnrolledExams(response.data);
         }

@@ -16,6 +16,10 @@ const QuestionBank = ({ teacherId }) => {
   const [filteredQuestions, setFilteredQuestions] = useState([]); // Câu hỏi sau khi lọc
   const [categories, setCategories] = useState([]); // Danh sách danh mục
   const [selectedCategory, setSelectedCategory] = useState(""); // Danh mục được chọn
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
+  console.log("Biến môi trường api là: ", apiUrl)
+
 
   const location = useLocation();
 
@@ -44,14 +48,14 @@ const QuestionBank = ({ teacherId }) => {
     const fetchData = async () => {
       try {
         // Gọi API lấy danh sách câu hỏi
-        const questionRes = await fetch(`http://localhost/react_api/fetch_questions.php?teacher_id=${teacherId}`);
+        const questionRes = await fetch(`${apiUrl}/fetch_questions.php?teacher_id=${teacherId}`);
         const questionData = await questionRes.json();
         setAllQuestions(questionData);
         setFilteredQuestions(questionData); // Ban đầu hiển thị toàn bộ câu hỏi
         console.log("Toàn bộ câu hỏi: ", questionData)
 
         // Gọi API lấy danh sách danh mục
-        const categoryRes = await fetch("http://localhost/react_api/get_categories.php");
+        const categoryRes = await fetch(`${apiUrl}/get_categories.php`);
         const categoryData = await categoryRes.json();
         setCategories(categoryData);
 
@@ -109,7 +113,7 @@ const QuestionBank = ({ teacherId }) => {
     }
 
     // Gửi yêu cầu xóa
-    fetch("http://localhost/react_api/delete_questions.php", {
+    fetch(`${apiUrl}/delete_questions.php`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question_ids: selectedQuestions }),

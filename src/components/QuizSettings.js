@@ -19,6 +19,8 @@ const QuizSettings = ({ examId, onBack, userId }) => {
   const [showModal, setShowModal] = useState(false); // Modal thêm câu hỏi
   const [availableQuestions, setAvailableQuestions] = useState([]); // Ngân hàng câu hỏi
 
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
   // 🔹 Lấy thông tin bài thi & danh sách câu hỏi
   useEffect(() => {
     fetchQuizDetails();
@@ -28,7 +30,7 @@ const QuizSettings = ({ examId, onBack, userId }) => {
   // 🛑 Lấy thông tin bài thi
   const fetchQuizDetails = async () => {
     try {
-      const response = await fetch(`http://localhost/react_api/get_quizz.php?exam_id=${examId}`);
+      const response = await fetch(`${apiUrl}/get_quizz.php?exam_id=${examId}`);
       const data = await response.json();
       // setQuizData(data); DỮ liệu chưa cần đến
       setFormData({
@@ -47,7 +49,7 @@ const QuizSettings = ({ examId, onBack, userId }) => {
   const fetchExamQuestions = async () => {
     try {
 
-      const response = await fetch(`http://localhost/react_api/fetch_exam_questions.php?exam_id=${examId}`, {
+      const response = await fetch(`${apiUrl}/fetch_exam_questions.php?exam_id=${examId}`, {
 
         method: "POST",
         headers: {
@@ -66,7 +68,7 @@ const QuizSettings = ({ examId, onBack, userId }) => {
   // 🛑 Lấy danh sách câu hỏi từ ngân hàng câu hỏi
   const fetchAvailableQuestions = async () => {
     try {
-      const response = await fetch(`http://localhost/react_api/fetch_questions.php?teacher_id=${userId}`);
+      const response = await fetch(`${apiUrl}/fetch_questions.php?teacher_id=${userId}`);
       const data = await response.json();
       setAvailableQuestions(data);
     } catch (error) {
@@ -78,7 +80,7 @@ const QuizSettings = ({ examId, onBack, userId }) => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const response = await fetch("http://localhost/react_api/update_quiz.php", {
+      const response = await fetch(`${apiUrl}/update_quiz.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -104,7 +106,7 @@ const QuizSettings = ({ examId, onBack, userId }) => {
     if (!window.confirm("Bạn có chắc muốn xóa câu hỏi này khỏi bài thi không?")) return;
 
     try {
-      const response = await fetch("http://localhost/react_api/remove_question_from_exam.php", {
+      const response = await fetch(`${apiUrl}/remove_question_from_exam.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -127,7 +129,7 @@ const QuizSettings = ({ examId, onBack, userId }) => {
   // 🛑 Thêm câu hỏi vào bài thi
   const handleAddQuestion = async (question) => {
     try {
-      const response = await fetch("http://localhost/react_api/add_question_to_exam.php", {
+      const response = await fetch(`${apiUrl}/add_question_to_exam.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

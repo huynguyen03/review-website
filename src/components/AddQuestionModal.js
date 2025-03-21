@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Modal, Button, Form, InputGroup, FormControl } from "react-bootstrap";
 
 const AddQuestionModal = ({ teacherId, onClose, onSuccess }) => {
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
   const [questionData, setQuestionData] = useState({
     question_title: "",
     question_text: "",
@@ -34,7 +36,7 @@ const AddQuestionModal = ({ teacherId, onClose, onSuccess }) => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch("http://localhost/react_api/add_question.php", {
+      const response = await fetch(`${apiUrl}/add_question.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

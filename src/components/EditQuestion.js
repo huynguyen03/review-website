@@ -15,13 +15,15 @@ const EditQuestion = ({ show, onHide, questionId = null, teacherId, onQuestionUp
     code_answer: "", // Dành cho code_response
     short_answer: "", // Dành cho short_answer
   });
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
 
   useEffect(() => {
     if (!questionId) return;
   
     const fetchQuestionData = async () => {
       try {
-        const response = await axios.get(`http://localhost/react_api/fetch_question.php?question_id=${questionId}`);
+        const response = await axios.get(`${apiUrl}/fetch_question.php?question_id=${questionId}`);
         if (response.data && !response.data.error) {
           setQuestionData((prevData) => ({
             ...prevData,
@@ -63,13 +65,13 @@ const EditQuestion = ({ show, onHide, questionId = null, teacherId, onQuestionUp
     try {
       let response;
       if (questionId) {
-        response = await axios.put("http://localhost/react_api/update_question.php", {
+        response = await axios.put(`${apiUrl}/update_question.php`, {
           question_id: questionId,
           teacher_id: teacherId,
           ...questionData,
         });
       } else {
-        response = await axios.post("http://localhost/react_api/add_question.php", {
+        response = await axios.post(`${apiUrl}/add_question.php`, {
           teacher_id: teacherId,
           ...questionData,
         });

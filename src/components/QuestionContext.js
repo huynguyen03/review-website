@@ -4,6 +4,7 @@ const QuestionContext = createContext();
 
 export const QuestionProvider = ({ children }) => {
   const [questions, setQuestions] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
   // ✅ Dùng useCallback để tối ưu việc gọi API
   const fetchQuestions = useCallback(async (teacherId) => {
@@ -12,7 +13,7 @@ export const QuestionProvider = ({ children }) => {
     
     try {
       console.log(`Đang lấy về câu hỏi cho giáo viên có ID: ${teacherId}`);
-      const res = await fetch(`http://localhost/react_api/fetch_questions.php?teacher_id=${teacherId}`);
+      const res = await fetch(`${apiUrl}/fetch_questions.php?teacher_id=${teacherId}`);
       
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
 

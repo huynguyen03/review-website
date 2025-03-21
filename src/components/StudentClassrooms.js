@@ -10,13 +10,14 @@ const StudentClassrooms = ({ userId , roleId}) => {
     const [selectedClassroom, setSelectedClassroom] = useState(null);//chọn lớp học
   
   const [showClassroom, setShowClassroom] = useState(false);//vào lớp học
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 
   // Lấy danh sách Lớp học công khai
   useEffect(() => {
     const fetchPublicClassrooms = async () => {
       try {
-        const response = await axios.get("http://localhost/react_api/fetch_public_classrooms.php");
+        const response = await axios.get(`${apiUrl}/fetch_public_classrooms.php`);
         setPublicClassrooms(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách Lớp học công khai!", error);
@@ -29,7 +30,7 @@ const StudentClassrooms = ({ userId , roleId}) => {
   useEffect(() => {
     const fetchEnrolledClassrooms = async () => {
       try {
-        const response = await axios.get(`http://localhost/react_api/fetch_my_classrooms.php?user_id=${userId}`);
+        const response = await axios.get(`${apiUrl}/fetch_my_classrooms.php?user_id=${userId}`);
         if (Array.isArray(response.data)) {
           setEnrolledClassrooms(response.data);
         }
@@ -53,7 +54,7 @@ const StudentClassrooms = ({ userId , roleId}) => {
     }
 
     try {
-      const response = await axios.post("http://localhost/react_api/join_classroom.php", {
+      const response = await axios.post(`${apiUrl}/join_classroom.php`, {
         student_id: userId,
         classroom_id: classroomId,
 

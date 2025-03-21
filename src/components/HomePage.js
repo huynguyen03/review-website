@@ -15,11 +15,14 @@ const HomePage = ({ userId, roleId }) => {
   const [selectedClassroom, setSelectedClassroom] = useState(null); // Chọn lớp học
   const [showClassroom, setShowClassroom] = useState(false); // Vào lớp học
 
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
+
   // Lấy danh sách bài thi công khai
   useEffect(() => {
     const fetchPublicExams = async () => {
       try {
-        const response = await axios.get("http://localhost/react_api/fetch_public_exams.php");
+        const response = await axios.get(`${apiUrl}/fetch_public_exams.php`);
         setPublicExams(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách bài thi công khai!", error);
@@ -32,7 +35,7 @@ const HomePage = ({ userId, roleId }) => {
   useEffect(() => {
     const fetchPublicClassrooms = async () => {
       try {
-        const response = await axios.get("http://localhost/react_api/fetch_public_classrooms.php");
+        const response = await axios.get(`${apiUrl}/fetch_public_classrooms.php`);
         setPublicClassrooms(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách Lớp học công khai!", error);
@@ -45,7 +48,7 @@ const HomePage = ({ userId, roleId }) => {
   useEffect(() => {
     const fetchJoinedClassrooms = async () => {
       try {
-        const response = await axios.get(`http://localhost/react_api/fetch_my_classrooms.php?user_id=${userId}`);
+        const response = await axios.get(`${apiUrl}/fetch_my_classrooms.php?user_id=${userId}`);
         if (Array.isArray(response.data)) {
           const joinedClassroomsMap = {};
           response.data.forEach((classroom) => {
@@ -71,7 +74,7 @@ const HomePage = ({ userId, roleId }) => {
     }
 
     try {
-      const response = await axios.post("http://localhost/react_api/join_classroom.php", {
+      const response = await axios.post(`${apiUrl}/join_classroom.php`, {
         student_id: userId,
         classroom_id: classroomId,
       });
@@ -116,7 +119,7 @@ const HomePage = ({ userId, roleId }) => {
               <Row className="mb-4">
                 {publicExams.slice(0, 3).map((exam) => (
                   <Col key={exam.exam_id} md={4} className="mb-3">
-                    <Card className="exam-card shadow-lg">
+                    <Card className="exam-card shadow-lg .card-exam">
                       <Card.Img variant="top" src={exam.image_url || defaultExamImafe} className="card-image" />
                       <Card.Body>
                         <Card.Title>{exam.exam_name}</Card.Title>

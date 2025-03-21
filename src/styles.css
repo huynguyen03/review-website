@@ -99,6 +99,17 @@
     text-decoration: none;
   }
   
+
+  .h3-header {
+    width: 600px;
+    font-size: 1.75rem; /* Tăng kích thước chữ */
+    font-weight: bold;  /* Làm chữ đậm */
+    border-bottom: 2px solid #3c0fba; /* Lằn kẻ bên dưới để làm nổi bật */
+    border-left: 15px solid #3c0fba; /* Lằn kẻ bên dưới để làm nổi bật */
+
+    padding:0 0 10px 10px; /* Khoảng cách giữa chữ và lằn kẻ */
+    margin: 32px 0 24px 0;
+  }
   /* Sidebar styles */
   #sidebar {
     width: 250px;
@@ -126,7 +137,30 @@
   .sidebar-container .feature i {
     margin-right: 10px;
   }
-  
+  /* Tạo hiệu ứng hover cho các mục */
+.sidebar-hover:hover {
+  background-color: #0056b3;
+}
+
+/* Mục đang được chọn */
+.nav-item.active .nav-link {
+  background-color: #007bff;
+  border-radius: 5px;
+}
+
+/* Điều chỉnh sidebar khi thu gọn */
+.sidebar-open {
+  max-width: 250px;
+}
+
+.sidebar-closed {
+  max-width: 80px;
+}
+
+/* Hiệu ứng chuyển động khi mở/đóng */
+.sidebar-open, .sidebar-closed {
+  transition: max-width 0.3s ease-in-out;
+}
   /* Custom form styles */
   .form-main {
     background-color: rgba(0, 0, 0, 0.6);
@@ -200,7 +234,7 @@
 /* Hiệu ứng hover cho các Card */
 
 /* Card với viền và nền mềm */
-.card {
+.card-exam {
   width: 100%;  /* Chiếm toàn bộ chiều rộng của cột */
   height: 300px;  /* Điều chỉnh chiều cao của Card cho phù hợp */
   margin-bottom: 24px;  /* Khoảng cách dưới giữa các Card */
@@ -212,7 +246,7 @@
 }
 
 /* Card khi hover */
-.card:hover {
+.card-exam:hover {
   transform: scale(1.05);  /* Phóng to khi hover */
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);  /* Tăng độ bóng khi hover */
 }

@@ -17,6 +17,9 @@ const AuthForm = ({ onClose, onLogin }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
+  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -30,8 +33,8 @@ const AuthForm = ({ onClose, onLogin }) => {
     try {
       const response = await axios.post(
         isRegister
-          ? "http://localhost/react_api/user_register.php"
-          : "http://localhost/react_api/user_login.php",
+          ? `${apiUrl}/user_register.php`
+          : `${apiUrl}/user_login.php`,
         formData
       );
 

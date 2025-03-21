@@ -15,6 +15,7 @@ const QuizList = ({ userRole, userId }) => {
 
   const section = queryParams.get("section");
   const action = queryParams.get("action");
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     if (section === "my_quiz") {
@@ -24,7 +25,7 @@ const QuizList = ({ userRole, userId }) => {
 
   const fetchQuizzes = async () => {
     try {
-      const response = await fetch("http://localhost/react_api/get_quizzes.php");
+      const response = await fetch(`${apiUrl}/get_quizzes.php`);
       const data = await response.json();
       setQuizzes(data);
     } catch (error) {
@@ -46,7 +47,7 @@ const QuizList = ({ userRole, userId }) => {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost/react_api/delete_quiz.php", {
+      const response = await fetch(`${apiUrl}/delete_quiz.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

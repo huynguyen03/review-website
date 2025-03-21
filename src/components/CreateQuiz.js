@@ -58,17 +58,18 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
   const [isRandomQuestion, setIsrandomQuestion] = useState(false)
   const [randomQuestionData, setRandomQuestionData] = useState(null); // lưu tạm ma trận đợi gọi tạo bài thi
 
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 
   useEffect(() => {
     const fetchQuestionsAndCategories  = async () => {
       try {
-        const response = await fetch(`http://localhost/react_api/fetch_questions.php?teacher_id=${teacherId}`);
+        const response = await fetch(`${apiUrl}/fetch_questions.php?teacher_id=${teacherId}`);
         const data = await response.json();
         setQuestions(data);
         setFilteredQuestions(data);
 
-        const categoriesResponse = await fetch("http://localhost/react_api/get_categories.php"); // Giả sử có endpoint để lấy danh mục
+        const categoriesResponse = await fetch(`${apiUrl}/get_categories.php`); // Giả sử có endpoint để lấy danh mục
         const categoriesData = await categoriesResponse.json();
         setCategories(categoriesData);
         // console.log("Danh mục: ", categories)
@@ -115,7 +116,7 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
     };
 
     try {
-      const response = await fetch("http://localhost/react_api/create_quiz.php", {
+      const response = await fetch("${apiUrl}/create_quiz.php", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
