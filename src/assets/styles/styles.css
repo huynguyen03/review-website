@@ -39,7 +39,7 @@
   /* Main banner styles */
   .main-banner {
     position: relative;
-    background-image: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)), url('./assets/images/img-study.jpg');
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)), url('../images/img-study.jpg');
     background-size: cover;
     background-position: left top;
     min-height: 750px;
@@ -110,57 +110,7 @@
     padding:0 0 10px 10px; /* Khoảng cách giữa chữ và lằn kẻ */
     margin: 32px 0 24px 0;
   }
-  /* Sidebar styles */
-  #sidebar {
-    width: 250px;
-    background-color: #29075e;
-    color: white;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
   
-  #sidebar .img-sidebar img {
-    display: block;
-    margin: 20px auto;
-    max-width: 250px;
-  }
-  
-  .sidebar-container .feature {
-    padding: 10px;
-    border-bottom: 1px solid #7a7a7a;
-    display: flex;
-    align-items: center;
-  }
-  
-  .sidebar-container .feature i {
-    margin-right: 10px;
-  }
-  /* Tạo hiệu ứng hover cho các mục */
-.sidebar-hover:hover {
-  background-color: #0056b3;
-}
-
-/* Mục đang được chọn */
-.nav-item.active .nav-link {
-  background-color: #007bff;
-  border-radius: 5px;
-}
-
-/* Điều chỉnh sidebar khi thu gọn */
-.sidebar-open {
-  max-width: 250px;
-}
-
-.sidebar-closed {
-  max-width: 80px;
-}
-
-/* Hiệu ứng chuyển động khi mở/đóng */
-.sidebar-open, .sidebar-closed {
-  transition: max-width 0.3s ease-in-out;
-}
   /* Custom form styles */
   .form-main {
     background-color: rgba(0, 0, 0, 0.6);

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../assets/images/logo/logo_transparent_blue.png';
 import avatar from '../assets/images/avartar_defaul_1.png';
 
-import AccountInfo from "./AccountInfo";
 
 const Header = ({ user, onLogout, onAuthClick }) => {
   const navigate = useNavigate();
@@ -65,6 +64,9 @@ const Header = ({ user, onLogout, onAuthClick }) => {
             <li className="nav-item">
               <a href="/users" className="nav-link">Bài tập của tôi</a>
             </li>
+
+
+            
             <li className="nav-item">
               {user ? (
                 <div
@@ -140,12 +142,7 @@ const Header = ({ user, onLogout, onAuthClick }) => {
       </nav>
 
       {/* Modal hiển thị thông tin tài khoản */}
-      <AccountInfo
-        show={showModalAcc}
-        onHide={handleHideModal}
-        userId={user?.user_id || "0"} // Truyền id người dùng vào modal
-        ref={modalRef} // Gắn tham chiếu vào Modal
-      />
+      
     </header>
   );
 };

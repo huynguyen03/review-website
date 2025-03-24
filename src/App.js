@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation} from "react-router-dom";
 import Home from "./components/Home.js";
 import Users from "./components/Users.js";
 import Teacher from "./components/Teacher.js";
 import Header from "./components/Header.js";
 import AuthForm from "./components/AuthForm.js";
+import FillInfoComponent from "./components/FillInfoComponent.js";
+import Sidebar from "./components/Sidebar.js";
+
+
+
 
 function Main({ user, setUser, showAuthForm, setShowAuthForm, handleLogin, handleLogout }) {
   const location = useLocation();
@@ -13,25 +18,30 @@ function Main({ user, setUser, showAuthForm, setShowAuthForm, handleLogin, handl
   useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user)); // Lưu thông tin người dùng
-      console.log("user", user)
     }
     localStorage.setItem("lastPath", location.pathname); // Lưu đường dẫn hiện tại
-  }, [user, location.pathname]);
+
+    // Kiểm tra nếu vào /fill-info thì đóng modal
+    if (location.pathname === "/fill-info") {
+      setShowAuthForm(false);
+    }
+  }, [user, location.pathname, setShowAuthForm]);
 
   return (
     <>
-      {/* Header */}
       <Header
         user={user}
         onLogout={handleLogout}
         onAuthClick={() => setShowAuthForm(true)} // Hiển thị AuthForm khi nhấn
       />
+      {user && <Sidebar roleId={user.role_id} onLogout={handleLogout}/>}
 
       {/* Các Routes */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/users" element={user?.role_id === "2" ? <Users /> : <Navigate to="/" />} />
         <Route path="/teacher" element={user?.role_id === "1" ? <Teacher /> : <Navigate to="/" />} />
+        <Route path="/fill-info" element={<FillInfoComponent />} />
       </Routes>
 
       {/* Hiển thị AuthForm */}
@@ -55,7 +65,6 @@ function Main({ user, setUser, showAuthForm, setShowAuthForm, handleLogin, handl
     </>
   );
 }
-
 function App() {
   const [showAuthForm, setShowAuthForm] = useState(false); // Kiểm soát hiển thị form
   const [user, setUser] = useState(null); // Quản lý thông tin người dùng
@@ -94,7 +103,7 @@ function App() {
   }
 
   return (
-    <Router>
+    <BrowserRouter>
       <Main
         user={user}
         setUser={setUser}
@@ -103,8 +112,9 @@ function App() {
         handleLogin={handleLogin}
         handleLogout={handleLogout}
       />
-    </Router>
+    </BrowserRouter>
   );
 }
+
 
 export default App;

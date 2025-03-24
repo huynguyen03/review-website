@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import axios from "axios";
 
-const AccountInfo = ({ show, onHide, userId }) => {
+const AccountInfo = ({ userId }) => {
   const [userData, setUserData] = useState({
     username: "",
-    email: "", // Email chỉ hiển thị
+    email: "",
     password: "", // Mật khẩu cũ
     newPassword: "", // Mật khẩu mới
     confirmPassword: "", // Xác nhận mật khẩu mới
@@ -18,20 +18,18 @@ const AccountInfo = ({ show, onHide, userId }) => {
 
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
-  // Lấy thông tin người dùng khi modal mở
+  // Lấy thông tin người dùng khi component mount
   useEffect(() => {
-    if (show) {
-      axios
-        .get(`${apiUrl}/get_user_info.php?user_id=${userId}`)
-        .then((response) => {
-          const { username, email } = response.data;
-          setUserData({ username, email, password: "", newPassword: "", confirmPassword: "" });
-        })
-        .catch((error) => {
-          console.error("Error fetching user info:", error);
-        });
-    }
-  }, [show, userId]);
+    axios
+      .get(`${apiUrl}/get_user_info.php?user_id=${userId}`)
+      .then((response) => {
+        const { username, email } = response.data;
+        setUserData({ username, email, password: "", newPassword: "", confirmPassword: "" });
+      })
+      .catch((error) => {
+        console.error("Error fetching user info:", error);
+      });
+  }, [userId]);
 
   const handleSave = () => {
     setIsLoading(true);
@@ -49,7 +47,7 @@ const AccountInfo = ({ show, onHide, userId }) => {
               const updatedData = { ...userData };
 
               axios
-                .post("${apiUrl}/update_user_info.php", {
+                .post(`${apiUrl}/update_user_info.php`, {
                   user_id: userId,
                   username: userData.username,
                   email: userData.email,
@@ -90,77 +88,79 @@ const AccountInfo = ({ show, onHide, userId }) => {
   };
 
   return (
-    <Modal show={show} onHide={onHide}>
-      <Modal.Header closeButton>
-        <Modal.Title>Thông tin tài khoản</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {isUpdated && <div className="alert alert-success">Thông tin đã được cập nhật!</div>}
-        <Form>
-          <Form.Group controlId="formUsername">
-            <Form.Label>Tên đăng nhập</Form.Label>
-            <Form.Control
-              type="text"
-              value={userData.username}
-              onChange={(e) =>
-                setUserData((prevState) => ({ ...prevState, username: e.target.value }))
-              }
-              disabled
-            />
-          </Form.Group>
+    <div className="account-info-container">
+      <div className="header">
+        <div className="avatar">
+          <img src="https://via.placeholder.com/100" alt="avatar" />
+        </div>
+        <div className="user-info">
+          <h2>{userData.username}</h2>
+          <p>{userData.email}</p>
+        </div>
+      </div>
 
-          <Form.Group controlId="formEmail">
-            <Form.Label>Email</Form.Label>
-            <Form.Control
-              type="email"
-              value={userData.email}
-              onChange={(e) =>
-                setUserData((prevState) => ({ ...prevState, email: e.target.value }))
-              }
-              disabled
-            />
-          </Form.Group>
+      {isUpdated && <div className="alert alert-success">Thông tin đã được cập nhật!</div>}
 
-          <Form.Group controlId="formPassword">
-            <Form.Label>Mật khẩu cũ</Form.Label>
-            <Form.Control
-              type="password"
-              value={userData.password}
-              onChange={(e) =>
-                setUserData((prevState) => ({ ...prevState, password: e.target.value }))
-              }
-            />
-            {currentPasswordError && <div className="text-danger">{currentPasswordError}</div>}
-          </Form.Group>
+      <Form>
+        <Form.Group controlId="formUsername">
+          <Form.Label>Tên đăng nhập</Form.Label>
+          <Form.Control
+            type="text"
+            value={userData.username}
+            onChange={(e) =>
+              setUserData((prevState) => ({ ...prevState, username: e.target.value }))
+            }
+            disabled
+          />
+        </Form.Group>
 
-          <Form.Group controlId="formNewPassword">
-            <Form.Label>Mật khẩu mới</Form.Label>
-            <Form.Control
-              type="password"
-              value={userData.newPassword}
-              onChange={(e) =>
-                setUserData((prevState) => ({ ...prevState, newPassword: e.target.value }))
-              }
-            />
-          </Form.Group>
+        <Form.Group controlId="formEmail">
+          <Form.Label>Email</Form.Label>
+          <Form.Control
+            type="email"
+            value={userData.email}
+            onChange={(e) =>
+              setUserData((prevState) => ({ ...prevState, email: e.target.value }))
+            }
+            disabled
+          />
+        </Form.Group>
 
-          <Form.Group controlId="formConfirmPassword">
-            <Form.Label>Xác nhận mật khẩu mới</Form.Label>
-            <Form.Control
-              type="password"
-              value={userData.confirmPassword}
-              onChange={(e) =>
-                setUserData((prevState) => ({ ...prevState, confirmPassword: e.target.value }))
-              }
-            />
-            {passwordError && <div className="text-danger">{passwordError}</div>}
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
-          Đóng
-        </Button>
+        <Form.Group controlId="formPassword">
+          <Form.Label>Mật khẩu cũ</Form.Label>
+          <Form.Control
+            type="password"
+            value={userData.password}
+            onChange={(e) =>
+              setUserData((prevState) => ({ ...prevState, password: e.target.value }))
+            }
+          />
+          {currentPasswordError && <div className="text-danger">{currentPasswordError}</div>}
+        </Form.Group>
+
+        <Form.Group controlId="formNewPassword">
+          <Form.Label>Mật khẩu mới</Form.Label>
+          <Form.Control
+            type="password"
+            value={userData.newPassword}
+            onChange={(e) =>
+              setUserData((prevState) => ({ ...prevState, newPassword: e.target.value }))
+            }
+          />
+        </Form.Group>
+
+        <Form.Group controlId="formConfirmPassword">
+          <Form.Label>Xác nhận mật khẩu mới</Form.Label>
+          <Form.Control
+            type="password"
+            value={userData.confirmPassword}
+            onChange={(e) =>
+              setUserData((prevState) => ({ ...prevState, confirmPassword: e.target.value }))
+            }
+          />
+          {passwordError && <div className="text-danger">{passwordError}</div>}
+        </Form.Group>
+
         <Button
           variant="primary"
           onClick={handleSave}
@@ -168,8 +168,8 @@ const AccountInfo = ({ show, onHide, userId }) => {
         >
           {isLoading ? "Đang lưu..." : "Lưu thông tin"}
         </Button>
-      </Modal.Footer>
-    </Modal>
+      </Form>
+    </div>
   );
 };
 

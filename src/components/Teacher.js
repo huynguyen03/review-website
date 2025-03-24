@@ -58,7 +58,7 @@ const Teacher = () => {
   return (
     <QuestionProvider>
       <div className="d-flex">
-        <Sidebar roleId={user.role_id}/>
+        
         <div className="content flex-grow-1 p-3" style={{ marginLeft: "250px" }}>
           <Headercontent />
           {renderSection()}

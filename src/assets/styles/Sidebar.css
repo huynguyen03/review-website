@@ -1,0 +1,155 @@
+/* Đảm bảo rằng sidebar sử dụng flexbox để phân bổ không gian */
+/* Sidebar styles */
+#sidebar {
+    width: 250px;
+    background-color:  #242299;
+    color: white;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  #sidebar .img-sidebar img {
+    display: block;
+    margin: 20px auto;
+    max-width: 250px;
+  }
+  #sidebar .nav.flex-column {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+#sidebar .nav.flex-column:last-of-type {
+    margin-bottom: 0; /* Khoảng cách cuối cùng nếu cần */
+    margin-top: auto;
+    
+}
+
+/* Đảm bảo các mục trong ul đầu tiên luôn nằm sát trên */
+#sidebar .nav.flex-column:first-of-type {
+    margin-top: 0; /* Xóa margin top để không có khoảng cách */
+    padding-top: 0;
+}
+#sidebar .nav.flex-column .nav-link:last-child {
+    margin-bottom: 0;
+}
+/* Đảm bảo mục Tài khoản luôn nằm dưới cùng */
+#sidebar .account-nav {
+    margin-top: auto; /* Đẩy mục tài khoản xuống dưới cùng */
+  }
+  
+  /* Menu dropdown của tài khoản */
+  .account-dropdown {
+    display: block; /* Ẩn mặc định */
+    padding: 10px 16px;
+    position: absolute;
+    top: 360px; /* Điều chỉnh để menu hiển thị ngay dưới mục tài khoản */
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    border-radius: 5px;
+    z-index: 10;
+  }
+  
+  .account-nav.active .account-dropdown {
+    display: block; /* Hiển thị dropdown khi mục tài khoản được nhấn */
+  }
+  
+  /* Style cho các mục trong dropdown */
+  .account-dropdown .dropdown-item {
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .account-dropdown .dropdown-item:hover {
+    background-color: #444;
+  }
+  
+  
+  .sidebar-container .feature {
+    padding: 10px;
+    border-bottom: 1px solid #7a7a7a;
+    display: flex;
+    align-items: center;
+  }
+  
+  .sidebar-container .feature i {
+    margin-right: 10px;
+  }
+  /* Tạo hiệu ứng hover cho các mục */
+.sidebar-hover:hover {
+  background-color: #0056b3;
+}
+
+/* Mục đang được chọn */
+.nav-item.active .nav-link {
+  background-color: #007bff;
+  border-radius: 5px;
+}
+
+/* Điều chỉnh sidebar khi thu gọn */
+.sidebar-open {
+  max-width: 250px;
+}
+
+.sidebar-closed {
+  max-width: 80px;
+}
+
+/* Hiệu ứng chuyển động khi mở/đóng */
+.sidebar-open, .sidebar-closed {
+  transition: max-width 0.3s ease-in-out;
+}
+.sidebar-open,
+.sidebar-closed {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+}
+
+.nav-item {
+  margin-bottom: 10px;
+}
+
+.sidebar-button {
+  background-color: #fff;
+  position: absolute;
+  top: 20px;
+  left: 235px;
+  transition: left 0.3s ease-in-out;
+  z-index: 10;
+}
+
+.nav .nav-link {
+    font-size: 1.1rem;  /* Tăng cỡ chữ */
+    display: flex;
+    align-items: center;  /* Căn giữa icon và chữ theo chiều dọc */
+    justify-content: flex-start;  /* Căn trái phần chữ */
+    padding: 10px;  /* Thêm một chút khoảng cách cho các mục */
+}
+
+.nav-link i {
+    display: flex;  /* Đảm bảo icon là một phần tử flex để căn giữa */
+    justify-content: center;  /* Căn giữa icon theo chiều ngang */
+    align-items: center;  /* Căn giữa icon theo chiều dọc */
+    width: 30px;  /* Chiều rộng cố định cho icon */
+    height: 30px;  /* Chiều cao cố định cho icon */
+    margin-right: 10px;  /* Khoảng cách giữa icon và văn bản */
+}
+
+.sidebar-button-right {
+    left: 22px;
+    top: 20px;
+}
+
+.sidebar-button-left {
+  left: 200px;
+  top: 22px;
+
+}
+.mt-auto {
+  margin-top: auto;
+}

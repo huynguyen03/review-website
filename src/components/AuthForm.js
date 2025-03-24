@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import Login from "./Login"
 
 const AuthForm = ({ onClose, onLogin }) => {
   const navigate = useNavigate(); // Điều hướng
@@ -18,6 +20,7 @@ const AuthForm = ({ onClose, onLogin }) => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
+  const clientId = '576703468358-oqv4ekrp6urmqfu7gshs62trv9tfn10o.apps.googleusercontent.com';  // Thay thế bằng Client ID của bạn
   
 
   const handleInputChange = (e) => {
@@ -223,6 +226,10 @@ const AuthForm = ({ onClose, onLogin }) => {
           {isRegister ? "Đăng ký" : "Đăng nhập"}
         </button>
 
+        <GoogleOAuthProvider clientId={clientId}>
+    
+          <Login />
+  </GoogleOAuthProvider>
         <button
           type="button"
           className="btn btn-link w-100"

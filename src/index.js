@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap trước
-import './styles.css'; // Import CSS tổng sau
+import './assets/styles/styles.css'; // Import CSS tổng sau
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
