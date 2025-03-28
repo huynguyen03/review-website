@@ -29,11 +29,14 @@ function Main({ user, setUser, showAuthForm, setShowAuthForm, handleLogin, handl
 
   return (
     <>
-      <Header
-        user={user}
-        onLogout={handleLogout}
-        onAuthClick={() => setShowAuthForm(true)} // Hiển thị AuthForm khi nhấn
-      />
+      {/* Chỉ hiển thị Header nếu không có user */}
+      {!user && (
+        <Header
+          user={user}
+          onLogout={handleLogout}
+          onAuthClick={() => setShowAuthForm(true)} // Hiển thị AuthForm khi nhấn
+        />
+      )}
       {user && <Sidebar roleId={user.role_id} onLogout={handleLogout}/>}
 
       {/* Các Routes */}

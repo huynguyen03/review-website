@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Spinner, Alert } from "react-bootstrap";
+import defautAvtUser from "../assets/images/avartar_defaul_1.png"
 import axios from "axios";
 
 const AccountInfo = ({ userId }) => {
@@ -23,8 +24,8 @@ const AccountInfo = ({ userId }) => {
     axios
       .get(`${apiUrl}/get_user_info.php?user_id=${userId}`)
       .then((response) => {
-        const { username, email } = response.data;
-        setUserData({ username, email, password: "", newPassword: "", confirmPassword: "" });
+        const { username, email, fullname } = response.data;
+        setUserData({ fullname, username, email, password: "", newPassword: "", confirmPassword: "" });
       })
       .catch((error) => {
         console.error("Error fetching user info:", error);
@@ -89,17 +90,19 @@ const AccountInfo = ({ userId }) => {
 
   return (
     <div className="account-info-container">
-      <div className="header">
-        <div className="avatar">
-          <img src="https://via.placeholder.com/100" alt="avatar" />
+      <div className="header d-flex align-items-center mb-4">
+        <div className="avatar me-3">
+          <img src={defautAvtUser} alt="avatar" className="rounded-circle" style={{ width: "80px", height: "80px" }}/>
         </div>
-        <div className="user-info">
-          <h2>{userData.username}</h2>
+        <div className="user-info" style={{alignItems: "center"}}>
+          <h2>{userData.fullname}</h2>
           <p>{userData.email}</p>
         </div>
       </div>
 
-      {isUpdated && <div className="alert alert-success">Thông tin đã được cập nhật!</div>}
+      {isUpdated && <Alert variant="success">Thông tin đã được cập nhật!</Alert>}
+      {currentPasswordError && <Alert variant="danger">{currentPasswordError}</Alert>}
+      {passwordError && <Alert variant="danger">{passwordError}</Alert>}
 
       <Form>
         <Form.Group controlId="formUsername">
@@ -111,6 +114,7 @@ const AccountInfo = ({ userId }) => {
               setUserData((prevState) => ({ ...prevState, username: e.target.value }))
             }
             disabled
+            className="mb-3"
           />
         </Form.Group>
 
@@ -123,6 +127,7 @@ const AccountInfo = ({ userId }) => {
               setUserData((prevState) => ({ ...prevState, email: e.target.value }))
             }
             disabled
+            className="mb-3"
           />
         </Form.Group>
 
@@ -134,8 +139,8 @@ const AccountInfo = ({ userId }) => {
             onChange={(e) =>
               setUserData((prevState) => ({ ...prevState, password: e.target.value }))
             }
+            className="mb-3"
           />
-          {currentPasswordError && <div className="text-danger">{currentPasswordError}</div>}
         </Form.Group>
 
         <Form.Group controlId="formNewPassword">
@@ -146,6 +151,7 @@ const AccountInfo = ({ userId }) => {
             onChange={(e) =>
               setUserData((prevState) => ({ ...prevState, newPassword: e.target.value }))
             }
+            className="mb-3"
           />
         </Form.Group>
 
@@ -157,16 +163,23 @@ const AccountInfo = ({ userId }) => {
             onChange={(e) =>
               setUserData((prevState) => ({ ...prevState, confirmPassword: e.target.value }))
             }
+            className="mb-3"
           />
-          {passwordError && <div className="text-danger">{passwordError}</div>}
         </Form.Group>
 
         <Button
           variant="primary"
           onClick={handleSave}
           disabled={isLoading}
+          className="w-100"
         >
-          {isLoading ? "Đang lưu..." : "Lưu thông tin"}
+          {isLoading ? (
+            <>
+              <Spinner animation="border" size="sm" /> Đang lưu...
+            </>
+          ) : (
+            "Lưu thông tin"
+          )}
         </Button>
       </Form>
     </div>

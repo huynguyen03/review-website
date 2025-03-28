@@ -179,8 +179,67 @@
   }
 /* CSS cho trang HomePage */
 
+.title {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Chọn phông chữ hiện đại */
+  font-size: 36px; /* Kích thước chữ lớn vừa phải */
+  font-weight: 600; /* Chữ đậm để tạo sự nổi bật */
+  color: #333; /* Màu chữ tối cho sự dễ đọc */
+  text-align: left; /* Căn giữa tiêu đề */
+  letter-spacing: 1px; /* Khoảng cách giữa các chữ */
+  margin-bottom: 20px; /* Khoảng cách dưới tiêu đề */
+  text-transform: uppercase; /* Viết hoa tất cả chữ cái */
+  position: relative;
+}
 
+.title::after {
+  content: ''; /* Tạo một đường gạch dưới */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #007bff; /* Màu của đường gạch dưới */
+  border-radius: 5px; /* Làm cho đường gạch dưới có góc bo tròn */
+}
 
+/* Tag cho bài thi */
+.tag-exam {
+  max-width: 48px;
+  text-align: center;
+  background-color: #007bff; /* Màu xanh */
+  color: white;
+  padding: 2px 2px;
+  margin-bottom: 4px;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 0.6rem;
+}
+
+/* Tag cho tiến trình bài thi */
+.tag-exam-progress {
+  background-color: #f39c12; /* Màu vàng */
+  color: white;
+  text-align: center;
+  font-size: 0.6rem;
+  margin-bottom: 4px;
+
+  padding: 2x 2px;
+  border-radius: 15px;
+  font-weight: bold;
+}
+
+/* Tag cho lớp học */
+.tag-classroom {
+  background-color: #28a745; /* Màu xanh lá */
+  max-width: 48px;
+  color: white;
+  padding: 2px 2px;
+  text-align: center;
+  font-size: 0.6rem;
+  margin-bottom: 4px;
+  border-radius: 15px;
+  font-weight: bold;
+}
 /* Hiệu ứng hover cho các Card */
 
 /* Card với viền và nền mềm */

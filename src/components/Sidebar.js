@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/images/logo/logo_transparent_1.png";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { faAnglesLeft, faAnglesRight, faRightFromBracket, faCircleUser } from '@fortawesome/free-solid-svg-icons'; // Import icon
+import { faAnglesLeft, faAnglesRight, faRightFromBracket, faCircleUser,faBars  } from '@fortawesome/free-solid-svg-icons'; // Import icon
 import '../assets/styles/Sidebar.css';  // Import CSS file
 
 const Sidebar = ({ roleId, onLogout }) => {
   const navigate = useNavigate();
-  console.log("Role người dùng nhận khi vào sidebar", roleId);
+  const [showAccountMenu, setShowAccountMenu] = useState(false); // menu con tài khoản
+  const accountMenuRef = useRef(null); // Tham chiếu đến menu tài khoản để kiểm tra click ngoài
 
   const menuItemsTeacher = [
     { key: "home", icon: "fas fa-home", label: "Trang chủ" },
@@ -23,10 +23,7 @@ const Sidebar = ({ roleId, onLogout }) => {
     { key: "my_classrooms", icon: "fas fa-chalkboard-teacher", label: "Lớp học của tôi" },
   ];
 
-  
-
   const menuItems = roleId === "1" ? menuItemsTeacher : menuItemsStudent;
-  console.log("mêu nu của GV hay HS", menuItems);
   const nameRole = roleId === "1" ? "teacher" : "users";
   const [isOpen, setIsOpen] = useState(true); // State để kiểm soát trạng thái mở/đóng
   const [activeItem, setActiveItem] = useState(null); // State để lưu mục đang được chọn
@@ -40,41 +37,52 @@ const Sidebar = ({ roleId, onLogout }) => {
     navigate(`/${nameRole}?section=${item.key}`);
   };
 
-
-
-  const [showAccountMenu, setShowAccountMenu] = useState(false); // menu con tài khoản
-
-  const handleAccountClick = () => {
-    setShowAccountMenu(!showAccountMenu);
-    console.log(showAccountMenu)
+  const handleAccountClick = (e) => {
+    e.stopPropagation(); // Ngừng sự kiện click từ lan truyền, tránh đóng menu khi click vào Tài khoản
+    setShowAccountMenu(prevState => !prevState); // Đảo ngược trạng thái của menu tài khoản
   };
 
 
   const handleLogout = () => {
     console.log("Đăng xuất...");
     onLogout();
-    // Thực hiện logout, ví dụ: xóa token, chuyển trang, v.v.
-    console.log(localStorage.getItem("user")); // Kiểm tra giá trị của lastPath
     localStorage.removeItem("lastPath"); // Xóa thông tin trang cuối cùng
     localStorage.removeItem("user"); // Xóa thông tin người dùng
-    setShowAccountMenu(false)
+    setShowAccountMenu(false); // Đóng menu tài khoản
     console.log("Xóa rồi", localStorage); // Kiểm tra giá trị của lastPath
-
     navigate("/"); // Quay lại trang chủ khi đăng xuất
-
   };
 
   const handleProfileClick = () => {
     navigate(`/${nameRole}?section=profile`);
-
   };
+
+  // Sử dụng useEffect để lắng nghe click bên ngoài menu tài khoản
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Kiểm tra nếu click bên ngoài menu tài khoản
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target)) {
+        setShowAccountMenu(false); // Đóng menu tài khoản nếu click bên ngoài
+      }
+    };
+
+    // Thêm sự kiện lắng nghe click toàn cục
+    // Thêm sự kiện lắng nghe click toàn cục
+    document.addEventListener("click", handleClickOutside);
+
+    // Dọn dẹp sự kiện khi component unmount
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []); // Chạy một lần khi component mount
+
   return (
     <aside
       id="sidebar"
       className={`fixed-left fixed-bottom text-white p-3 ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`}
       style={{
         height: "100vh",
-        transition: 'max-width 0.3s ease-in-out', // Thêm hiệu ứng khi mở/đóng
+        transition: 'max-width 0.3s ease-in-out',
       }}
     >
       <div className="text-center mb-4">
@@ -90,18 +98,20 @@ const Sidebar = ({ roleId, onLogout }) => {
         />
       </div>
 
+      {/* Nút hamburger */}
       <button
         onClick={toggleSidebar}
-        className={`btn bg-white mb-3 sidebar-button ${isOpen ? 'sidebar-button-left' : 'sidebar-button-right'}`}
+        className={`sidebar-button ${isOpen ? 'sidebar-button-left' : 'sidebar-button-right'}`}
       >
-        <FontAwesomeIcon icon={isOpen ? faAnglesLeft : faAnglesRight} />
+        <FontAwesomeIcon icon={faBars} />
       </button>
+
 
       <ul className="nav flex-column">
         {menuItems.map((item) => (
           <li
             key={item.key}
-            className={`nav-item ${activeItem === item.key ? 'active' : ''}`}
+            className={`nav-item ${activeItem === item.key && !showAccountMenu ? 'active' : ''}`}
           >
             <button
               className="nav-link w-100 text-white sidebar-hover"
@@ -112,47 +122,41 @@ const Sidebar = ({ roleId, onLogout }) => {
             </button>
           </li>
         ))}
-        </ul>
-
-      
-      <ul className="nav flex-column account-nav">
-
-      <li className="nav-item">
-
-      {showAccountMenu && (
-      <div className="account-dropdown">
-        <div
-          className="dropdown-item d-flex align-items-center"
-          onClick={handleProfileClick}
-          style={{ cursor: 'pointer' }}
-        >
-          <FontAwesomeIcon icon={faCircleUser} className="me-2" />
-          Hồ sơ cá nhân
-        </div>
-        <div
-          className="dropdown-item d-flex align-items-center"
-          onClick={handleLogout}
-          style={{ cursor: 'pointer' }}
-        >
-          <FontAwesomeIcon icon={faRightFromBracket} className="me-2" />
-          Đăng xuất
-        </div>
-      </div>
-        )}
-        </li>
-        <li className="nav-item">
-        <button
-          className="nav-link w-100 text-white sidebar-hover"
-          onClick={handleAccountClick}
-        >
-          <i className="fas fa-user me-2"></i>
-          <span className={isOpen ? '' : 'd-none'}>Tài khoản</span>
-        </button>
-      </li>
-
       </ul>
 
-
+      <ul className="nav flex-column account-nav">
+        <li className="nav-item" ref={accountMenuRef}>
+          {showAccountMenu && (
+            <div className="account-dropdown">
+              <div
+                className="dropdown-item d-flex align-items-center"
+                onClick={handleProfileClick}
+                style={{ cursor: 'pointer' }}
+              >
+                <FontAwesomeIcon icon={faCircleUser} className="me-2" />
+                Hồ sơ cá nhân
+              </div>
+              <div
+                className="dropdown-item d-flex align-items-center"
+                onClick={handleLogout}
+                style={{ cursor: 'pointer' }}
+              >
+                <FontAwesomeIcon icon={faRightFromBracket} className="me-2" />
+                Đăng xuất
+              </div>
+            </div>
+          )}
+        </li>
+        <li className={`nav-item ${showAccountMenu ? 'active' : ''}`}>
+          <button
+            className={"nav-link w-100 text-white sidebar-hover"}
+            onClick={handleAccountClick}
+          >
+            <i className="fas fa-user me-2"></i>
+            <span className={isOpen ? '' : 'd-none'}>Tài khoản</span>
+          </button>
+        </li>
+      </ul>
     </aside>
   );
 };

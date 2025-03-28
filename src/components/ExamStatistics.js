@@ -15,7 +15,7 @@ import { exportScores } from "./exportScores";
 // Đăng ký các thành phần của Chart.js
 ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
-const ExamStatistics = ({ examId }) => {
+const ExamStatistics = ({ examId, userId }) => {
   const [examData, setExamData] = useState([]);
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -23,7 +23,7 @@ const ExamStatistics = ({ examId }) => {
     const fetchExamData = async () => {
       try {
         const response = await fetch(
-          `${apiUrl}/fetch_exam_results.php?exam_id=${examId}`
+          `${apiUrl}/fetch_exam_results.php?exam_id=${examId}&user_id=${userId}`
         );
         const data = await response.json();
         setExamData(data);
