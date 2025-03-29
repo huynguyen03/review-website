@@ -1,0 +1,119 @@
+/* Main banner */
+/* Main banner */
+.main-banner {
+    position: relative;
+    width: 100%; /* Chiếm toàn bộ chiều rộng màn hình */
+    height: 650px; /* Chiều cao của banner */
+    overflow: hidden; /* Ẩn phần dư thừa */
+  }
+  
+  .banner-container {
+    display: flex; /* Hiển thị các banner trong dạng dòng ngang */
+    transition: transform 1s ease-in-out; /* Hiệu ứng chuyển động mượt mà */
+  }
+
+  .main-banner img {
+    width: 100%; /* Chiếm toàn bộ chiều rộng */
+    height: 100%; /* Chiếm toàn bộ chiều cao */
+    object-fit: cover; /* Đảm bảo hình ảnh phủ đầy phần tử mà không bị méo */
+  }
+  
+  .banner-item {
+    flex: 0 0 100%; /* Mỗi banner chiếm 100% chiều rộng */
+    height: 100%; /* Chiều cao của banner */
+  }
+  /* Các banner nhỏ dưới màn hình */
+  .small-banners {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+  }
+  
+  .small-banners img {
+    width: 142px;
+    height: 84px;
+    border-radius: 10px;
+    cursor: pointer;
+    opacity: 0.6;
+  }
+  
+  .small-banners img.active {
+    opacity: 1;
+    border: 2px solid #fff;
+  }
+  
+  /* Các nút điều khiển bên trái và phải */
+  .prev, .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .prev {
+    left: 10px;
+  }
+  
+  .next {
+    right: 10px;
+  }
+
+
+  .card-header .custom-card-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+  }
+  
+  .mb-4 .custom-card {
+    min-height: 400px; /* Đặt chiều cao của card */
+    border-radius: 15px; /* Bo góc card */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hiệu ứng shadow */
+    border: none; /* Bỏ viền */
+  }
+  
+  .card-body {
+    display: flex;
+    height: 100%;
+  }
+  
+  .card-header {
+    display: flex;
+    align-items: center; /* Hình ảnh và tiêu đề nằm cùng hàng */
+    margin-bottom: 10px;
+    width: 100%;
+  }
+  .card-body .ml-3{
+    
+    text-align: left;
+    margin-left: 15px;
+  }
+  
+  .card-header  .ml-3 .custom-card-title {
+    
+    font-size: 2.5rem !important;
+    
+  }
+  .content {
+    align-items: start !important;
+  }
+  .content .custom-card-title-content {
+    
+    font-size: 1rem !important;
+    
+  }
+  
+  .card-body .content {
+    display: flex;
+    flex-direction: column; /* Các phần tử dưới hình ảnh và tiêu đề nằm theo chiều dọc */
+    margin-top: 10px;
+  }
+  
+  

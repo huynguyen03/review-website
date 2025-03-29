@@ -14,7 +14,7 @@ import defaultAvtteacher from "../assets/images/avatar-defaut-teacher.png";
 
 import { useSearch } from "./SearchContext"; // Import hook sử dụng tìm kiếm
 
-import "../assets/styles/HomePage.css"
+import "../assets/styles/ExamCard.css"
 
 const HomePage = ({ userId, roleId }) => {
   const [selectedExam, setSelectedExam] = useState(null); // Chọn bài thi

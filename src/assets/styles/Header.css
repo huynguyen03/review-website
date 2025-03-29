@@ -1,0 +1,62 @@
+/* Header - Sticky top */
+.custom-header{
+  position: fixed; /* Đặt header cố định trên đầu trang */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99; /* Đảm bảo header nằm trên các phần tử khác */
+  transition: background-color 0.5s ease, transform 0.3s ease;
+  padding: 10px 0; /* Đảm bảo header có không gian đủ */
+  }
+  
+  /* .sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  } */
+  
+  .custom-nav {
+    padding: 0 !important;
+    color: #3c0fba !important;
+
+    transition: background-color 0.5s ease, box-shadow 0.3s ease;
+  }
+  
+  /* Khi chưa cuộn hoặc khi cuộn lên */
+  .bg-transparent {
+    background-color: rgba(255, 255, 255, 0.5); /* Nền trong suốt */
+  }
+  
+  .bg-header {
+    background-color: #02061bd5; /* Màu xanh dương đậm */
+  }
+  
+  .navbar-light .navbar-nav .nav-link {
+    color: #0d6efd !important;
+
+    transition: color 0.3s ease;
+  }
+  
+  .navbar-light .navbar-nav .nav-link.active {
+    color: #0d6efd; /* Màu cho link active */
+  }
+  
+  /* Nền trong suốt khi cuộn xuống */
+  .transparent-bg {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Hiệu ứng khi di chuyển lên xuống */
+  .navbar-scrolled {
+    transform: translateY(0); /* Header hiện lên từ trên */
+  }
+  
+  .navbar-hidden {
+    transform: translateY(-100%); /* Header biến mất đi từ dưới */
+  }
+  
+  /* Hiệu ứng cuộn */
+  .navbar.transitioning {
+    transition: transform 0.3s ease-out, background-color 0.5s ease-out;
+  }
+  

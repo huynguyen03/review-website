@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Footer = () => (
-  <footer className="bg-primary text-white py-4">
+  <footer className="bg-footer text-white py-4">
     <div className="container">
       <div className="row">
         <div className="col-md-6">
