@@ -1,25 +1,32 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import { SearchProvider } from "./SearchContext"; // Import SearchProvider
 
 import Sidebar from "./Sidebar";
 import UploadFileQuestion from "./UploadFileQuestion";
-import Headercontent from "./HeaderContent.js";
+import HeaderContent from "./HeaderContent.js";
 import QuestionBank from "./QuestionBank";
 import CreateQuiz from "./CreateQuiz";
 import QuizList from "./QuizList";
 import ManageClassroms from "./ManageClassrooms";
+import AccountInfo from "./AccountInfo.js";
+
 import { QuestionProvider } from "./QuestionContext";
 
 const Teacher = () => {
   const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
   const location = useLocation();
   const user = JSON.parse(localStorage.getItem("user")); 
-  console.log("Nhận được ID từ localStorage là: ", user.user_id)
+  console.log("Nhận được user từ localStorage là: ", user)
 
   // Lấy giá trị "section" từ query params, mặc định là "home"
   const searchParams = new URLSearchParams(location.search);
   const activeSection = searchParams.get("section") || "home";
+  const activeExamId = searchParams.get("exam_id") || "";
+  const activeClassroomId = searchParams.get("classroom_id") || "";
+
+  const activeSub = searchParams.get("sub") || "";
 
 
   const renderSection = () => {
@@ -45,10 +52,11 @@ const Teacher = () => {
       case "question_bank":
         return (
           <>
-            <UploadFileQuestion teacherId={user.user_id} />
             <QuestionBank teacherId={user.user_id} />
           </>
         );
+        case "profile":
+          return <AccountInfo userId={user.user_id} />;
 
       default:
         return <h2>Chọn một danh mục từ Sidebar</h2>;
@@ -57,13 +65,17 @@ const Teacher = () => {
 
   return (
     <QuestionProvider>
-      <div className="d-flex">
-        
-        <div className="content flex-grow-1 p-3" style={{ marginLeft: "250px" }}>
-          <Headercontent />
+      <SearchProvider> {/* Wrap the content with SearchProvider */}
+      <div className="d-flex flex-column" style={{ marginLeft: "250px", maxHeight: "100vh" }}>
+        <div className="flex-grow-1 custom-heading-content">
+
+          <HeaderContent />
+        </div>
+        <div className="content flex-grow-1 p-3" >
           {renderSection()}
         </div>
       </div>
+    </SearchProvider>
     </QuestionProvider>
   );
 };

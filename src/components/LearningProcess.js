@@ -3,7 +3,9 @@ import { Card, Button, Form, InputGroup, FormControl, Modal } from 'react-bootst
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesRight, faTimes } from '@fortawesome/free-solid-svg-icons';
 
-const LearningProcess = ({ userId }) => {
+import axios from 'axios';  // Nhập thư viện axios
+
+const LearningProcess = ({ userId, roleId }) => {
   const [processName, setProcessName] = useState('');
   const [processDescription, setProcessDescription] = useState('');
   const [exams, setExams] = useState([]); // Danh sách các bài thi đã chọn
@@ -12,23 +14,25 @@ const LearningProcess = ({ userId }) => {
   const [examList, setExamList] = useState([]); // Danh sách bài thi có sẵn từ API
   const [learningProcesses, setLearningProcesses] = useState([]); // Danh sách tiến trình ôn luyện
   const [selectedProcessId, setSelectedProcessId] = useState(null); // ID tiến trình được chọn
+  const [examRates, setExamRates] = useState({}); // Dùng để lưu tỷ lệ đạt yêu cầu cho từng bài thi
+
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 
   // Fetch danh sách tiến trình từ API
   const fetchLearningProcesses = async () => {
     try {
-      const response = await fetch(
-        `${apiUrl}/fetch_learning_processes.php?user_id=${userId}`
-      );
-      const data = await response.json();
-      setLearningProcesses(data);
-
-      // Sau khi đã có danh sách tiến trình, gọi API để lấy bài thi cho mỗi tiến trình
-      data.forEach(async (process) => {
-        const examsForProcess = await fetchExamsForProcess(process.process_id);
-        process.exams = examsForProcess; // Gắn các bài thi vào tiến trình
+      const response = await fetch(`${apiUrl}/fetch_learning_processes.php`, {
+        method: 'POST', // Sử dụng POST để gửi dữ liệu trong body
+        headers: {
+          'Content-Type': 'application/json', // Đảm bảo gửi dữ liệu dưới dạng JSON
+        },
+        body: JSON.stringify({
+          user_id: userId, // Truyền user_id trong body
+          role_id: roleId,  // Truyền role_id trong body
+        }),
       });
+      
     } catch (error) {
       console.error('Lỗi khi lấy tiến trình ôn luyện:', error);
     }
@@ -97,6 +101,7 @@ const LearningProcess = ({ userId }) => {
       console.error('Không có tiến trình được chọn!');
       return;
     }
+    const rate = examRates[exam.exam_id] || 80; // Tỷ lệ đạt yêu cầu
 
     try {
       const response = await fetch(`${apiUrl}/add_exam_to_process.php`, {
@@ -108,6 +113,7 @@ const LearningProcess = ({ userId }) => {
           process_id: selectedProcessId,
           exam_id: exam.exam_id,
           order_in_process: exams.length + 1, // Đặt thứ tự bài thi
+          rate: rate,
         }),
       });
       const data = await response.json();
@@ -118,6 +124,29 @@ const LearningProcess = ({ userId }) => {
       console.error('Lỗi khi thêm bài thi:', error);
     }
   };
+  
+const handleSaveProgress = () => {
+    exams.forEach((exam, index) => {
+      const rate = examRates[exam.exam_id] || 80; // Tỷ lệ đạt yêu cầu
+      const data = {
+        process_id: selectedProcessId,
+        exam_id: exam.exam_id,
+        order_in_process: index + 1,
+        rate: rate,  // Thêm tỷ lệ đạt yêu cầu
+      };
+  
+      // Gửi dữ liệu đến API
+      axios.post(`${apiUrl}/save_progress.php`, data)
+        .then(response => {
+          alert("Lưu tiến trình thành công")
+          console.log("Lưu tiến trình thành công", response.data);
+        })
+        .catch(error => {
+          console.error("Lỗi khi lưu tiến trình:", error);
+        });
+    });
+  };
+  
 
   // Gỡ bài thi khỏi tiến trình
   const handleRemoveExam = async (examToRemove) => {
@@ -159,7 +188,12 @@ const LearningProcess = ({ userId }) => {
       console.error('Lỗi khi gỡ tiến trình khỏi lớp học:', error);
     }
   };
-
+  const handleRateChange = (examId, value) => {
+    setExamRates(prevRates => ({
+      ...prevRates,
+      [examId]: value,  // Cập nhật tỷ lệ của bài thi với examId tương ứng
+    }));
+  };
   // Hiển thị modal
   const handleShowModal = () => setShowModal(true);
 
@@ -170,7 +204,7 @@ const LearningProcess = ({ userId }) => {
 
   return (
     <div>
-      <h3 className="h3-header">Tạo tiến trình ôn luyện</h3>
+      <h3 className="h3-header title">Tạo tiến trình ôn luyện</h3>
 
       {/* Modal hiển thị form tạo tiến trình */}
       <Modal show={showModal} onHide={handleCloseModal}>
@@ -228,7 +262,7 @@ const LearningProcess = ({ userId }) => {
                   </Card.Subtitle>
                   <Card.Text>Ngày tạo: {new Date(process.created_at).toLocaleString()}</Card.Text>
                   <Card.Text>Người tạo: {process.teacher_id}</Card.Text>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div className='d-flex flex-column'>
                     <Button
                       variant="success"
                       onClick={() => {
@@ -243,24 +277,7 @@ const LearningProcess = ({ userId }) => {
                     </Button>
                   </div>
 
-                  {/* Hiển thị bài thi trong tiến trình */}
-                  {process.exams && process.exams.length > 0 && (
-                    <div>
-                      <h5>Bài thi trong tiến trình:</h5>
-                      {process.exams.map((exam) => (
-                        <Card key={exam.exam_id}>
-                          <Card.Body>
-                            <Card.Title>{exam.exam_name}</Card.Title>
-                            <FontAwesomeIcon
-                              style={{ fontSize: '1.5rem', color: 'red', cursor: 'pointer' }}
-                              icon={faTimes}
-                              onClick={() => handleRemoveExam(exam)} // Gỡ bài thi khỏi tiến trình
-                            />
-                          </Card.Body>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
+                  
                 </Card.Body>
               </Card>
           </>
@@ -281,11 +298,15 @@ const LearningProcess = ({ userId }) => {
                       <Card style={{ width: '200px' }}>
                         <Card.Body>
                           <Card.Title>{exam.exam_name}</Card.Title>
-                          <InputGroup className="mb-3">
+                          <Card.Text>Nhập tỷ lệ đạt yêu cầu</Card.Text>
+                          <InputGroup className="mb-3" style={{width: "54px"}}>
                             <FormControl
-                              placeholder="Nhập tỷ lệ đạt yêu cầu"
+                              placeholder="%"
                               aria-label="Tỷ lệ đạt yêu cầu"
                               aria-describedby="basic-addon2"
+                              defaultValue="80" 
+                              value={examRates[exam.exam_id] || 80}  // Hiển thị tỷ lệ đã lưu hoặc mặc định là 80
+                  onChange={(e) => handleRateChange(exam.exam_id, e.target.value)}  // Cập nhật tỷ lệ khi thay đổi
                             />
                           </InputGroup>
                         </Card.Body>
@@ -306,6 +327,12 @@ const LearningProcess = ({ userId }) => {
                     </div>
                   ))}
                 </div>
+                <div className='mx-3'>
+      {/* Hiển thị nút "Lưu tiến trình" */}
+      <Button onClick={handleSaveProgress} variant="primary">
+        Lưu tiến trình
+      </Button>
+    </div>
               </div>
             )}
           </div>

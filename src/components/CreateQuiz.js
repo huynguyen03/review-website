@@ -62,7 +62,7 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
 
 
   useEffect(() => {
-    const fetchQuestionsAndCategories  = async () => {
+    const fetchQuestionsAndCategories = async () => {
       try {
         const response = await fetch(`${apiUrl}/fetch_questions.php?teacher_id=${teacherId}`);
         const data = await response.json();
@@ -96,7 +96,7 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
   const handleReceiveQuestionMatrix = (matrix) => {
     setRandomQuestionData(matrix); // Chỉ lưu dữ liệu, chưa gọi handleCreateQuiz
   };
-  
+
   const handleCreateQuiz = async (matrix) => {
     console.log(matrix)
     if (!quizName || !timeLimit || (selectedQuestions.length === 0 && isRandomQuestion === false)) {
@@ -116,7 +116,7 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
     };
 
     try {
-      const response = await fetch("${apiUrl}/create_quiz.php", {
+      const response = await fetch(`${apiUrl}/create_quiz.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -127,8 +127,8 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
       const result = await response.json();
       if (result.success) {
         alert("Bài thi đã được lưu thành công!");
-        setQuizName(""); 
-        setTimeLimit(""); 
+        setQuizName("");
+        setTimeLimit("");
         setSelectedQuestions([]);
         onQuizCreated(); // Gọi hàm cập nhật danh sách bài thi
       } else {
@@ -139,13 +139,13 @@ const CreateQuiz = ({ teacherId, onQuizCreated }) => {
       alert("Đã xảy ra lỗi khi lưu bài thi.");
     }
   }
-// Hàm tự cài đặt để di chuyển phần tử trong mảng
-const arrayMove = (array, fromIndex, toIndex) => {
-  const result = [...array];
-  const [movedItem] = result.splice(fromIndex, 1);  // Xóa phần tử ở vị trí fromIndex
-  result.splice(toIndex, 0, movedItem);  // Thêm phần tử đã xóa vào vị trí toIndex
-  return result;
-};
+  // Hàm tự cài đặt để di chuyển phần tử trong mảng
+  const arrayMove = (array, fromIndex, toIndex) => {
+    const result = [...array];
+    const [movedItem] = result.splice(fromIndex, 1);  // Xóa phần tử ở vị trí fromIndex
+    result.splice(toIndex, 0, movedItem);  // Thêm phần tử đã xóa vào vị trí toIndex
+    return result;
+  };
 
   const handleQuestionSelect = (question) => {
     setSelectedQuestions((prev) => {
@@ -186,17 +186,17 @@ const arrayMove = (array, fromIndex, toIndex) => {
 
 
   // Mở modal chỉnh sửa khi nhấn "Chỉnh sửa"
-// Hàm chỉnh sửa câu hỏi
-const handleEditQuestion = (updatedQuestion) => {
-  // Cập nhật câu hỏi sau khi chỉnh sửa
-  setQuestions((prevQuestions) =>
-    prevQuestions.map((question) =>
-      question.question_id === updatedQuestion.question_id
-        ? updatedQuestion
-        : question
-    )
-  );
-};
+  // Hàm chỉnh sửa câu hỏi
+  const handleEditQuestion = (updatedQuestion) => {
+    // Cập nhật câu hỏi sau khi chỉnh sửa
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((question) =>
+        question.question_id === updatedQuestion.question_id
+          ? updatedQuestion
+          : question
+      )
+    );
+  };
 
   // Hàm hiển thị modal chỉnh sửa câu hỏi
   // const handleShowModal = (questionId) => {
@@ -292,29 +292,29 @@ const handleEditQuestion = (updatedQuestion) => {
             </Form.Group>
           </Col>
         </Row>
-      
+
       </Form>
 
       <Row className="mb-3">
         <Col>
-          <Button 
-            variant="secondary" 
-            onClick={() => {setShowModal(true); setIsrandomQuestion(false)}}
-            >
+          <Button
+            variant="secondary"
+            onClick={() => { setShowModal(true); setIsrandomQuestion(false) }}
+          >
             Thêm câu hỏi từ ngân hành câu hỏi
           </Button>
-          <Button 
-            variant="secondary" 
-            className="mx-5" 
+          <Button
+            variant="secondary"
+            className="mx-5"
 
-            onClick={() => {setShowModal(false); setIsrandomQuestion(true); setSelectedQuestions([])}}>
+            onClick={() => { setShowModal(false); setIsrandomQuestion(true); setSelectedQuestions([]) }}>
             Thêm câu hỏi ngẩu nhiên theo ma trận
           </Button>
         </Col>
       </Row>
       {/* Hiển thị form khi nút "Thêm câu hỏi ngẫu nhiên" được nhấn */}
       {/* Hiển thị giao diện khi nút được nhấn */}
-      {isRandomQuestion && ( 
+      {isRandomQuestion && (
         <RandomQuestionSelector
           categories={categories}
           onAddRandomQuestions={handleReceiveQuestionMatrix}
@@ -359,7 +359,7 @@ const handleEditQuestion = (updatedQuestion) => {
                   <td>{question.question_title}</td>
                   <td>{question.answer_options?.[question.correct_answer_index] || "N/A"}</td>
                   <td>{question.score}</td>
-            
+
                   <td>{question.status}</td>
                   <td>{new Date(question.updated_at).toLocaleDateString()}</td>
                 </tr>
@@ -390,27 +390,27 @@ const handleEditQuestion = (updatedQuestion) => {
               <tbody>
                 {selectedQuestions.map((question) => (
                   <SortableItem
-                  key={question.question_id}
-              question={question}
-              onEdit={handleEditQuestion}  // Truyền hàm chỉnh sửa từ cha
-              onRemove={handleRemoveQuestion}  // Truyền hàm xóa từ cha
-              teacherId={1}  // Giả sử teacherId là 1
-                >
-                  
-                </SortableItem>
+                    key={question.question_id}
+                    question={question}
+                    onEdit={handleEditQuestion}  // Truyền hàm chỉnh sửa từ cha
+                    onRemove={handleRemoveQuestion}  // Truyền hàm xóa từ cha
+                    teacherId={1}  // Giả sử teacherId là 1
+                  >
+
+                  </SortableItem>
                 ))}
               </tbody>
             </Table>
           </SortableContext>
         </DndContext>
       )}
-<Button 
-  variant="success" 
-  className="mt-3"
-  onClick={() => handleCreateQuiz(randomQuestionData)}
->
-  Lưu và tạo bài thi
-</Button>
+      <Button
+        variant="success"
+        className="mt-3"
+        onClick={() => handleCreateQuiz(randomQuestionData)}
+      >
+        Lưu và tạo bài thi
+      </Button>
 
 
       {/* Hiển thị modal chỉnh sửa nếu có câu hỏi cần chỉnh sửa

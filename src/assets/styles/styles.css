@@ -36,7 +36,38 @@
     color: #fff;
   }
   
+div .custom-heading-content {
+  border-bottom: 2px solid #ccc;  /* Viền dưới với màu xám nhạt */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Hiệu ứng nổi nhẹ */
+  padding-bottom: 0px;  /* Khoảng cách dưới cùng với viền */
+  box-sizing: border-box;/* Đảm bảo padding không làm ảnh hưởng đến tổng chiều rộng */
 
+}
+ 
+
+.content {
+  flex-grow: 1;          /* Chiếm không gian còn lại */
+  padding: 15px;         /* Khoảng cách cho container */
+  /* margin-left: 284px;    Để dành không gian cho sidebar */
+  overflow-y: auto;      /* Hiển thị thanh cuộn dọc khi nội dung dài */
+  overflow-x: auto;      /* Hiển thị thanh cuộn ngang khi nội dung tràn ra ngoài */
+  max-width: 100%;       /* Giới hạn chiều rộng của content */
+  box-sizing: border-box;/* Đảm bảo padding không làm ảnh hưởng đến tổng chiều rộng */
+  height: calc(100vh - 30px); /* Đảm bảo chiều cao content chiếm toàn bộ chiều cao màn hình trừ padding */
+}
+div .content-container {
+  border: 1px solid #ccc;  /* Viền xung quanh */
+  border-radius: 8px;       /* Bo góc */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Hiệu ứng nổi lên */
+  margin: 8px;              /* Khoảng cách với các phần tử khác */
+  padding: 16px;            /* Khoảng cách bên trong vùng chứa */
+}
+
+
+.form-container {
+  max-height: 600px; /* Chiều cao tối đa */
+  overflow-y: auto; /* Thêm cuộn dọc khi nội dung vượt quá chiều cao */
+}
   /* Custom form styles */
   .form-main {
     background-color: rgba(0, 0, 0, 0.6);
@@ -49,7 +80,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 9999;
+    z-index: 999;
   }
   
   .form {
@@ -70,6 +101,8 @@
     border: 1px solid #ccc;
   }
   
+
+
   /* Tùy chỉnh Bảng Ngân hàng câu hỏi */
   .table-responsive {
     overflow-x: auto;

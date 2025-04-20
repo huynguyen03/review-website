@@ -15,6 +15,8 @@ const Sidebar = ({ roleId, onLogout }) => {
     { key: "my_quiz", icon: "fas fa-file-alt", label: "Bài tập của tôi" },
     { key: "manage_classrooms", icon: "fas fa-chalkboard-teacher", label: "Quản lý lớp học" },
     { key: "question_bank", icon: "fas fa-database", label: "Ngân hàng câu hỏi" },
+    { key: "learning_process", icon: "fas fa-graduation-cap", label: "Tiến trình ôn luyện" }
+
   ];
 
   const menuItemsStudent = [
@@ -99,12 +101,12 @@ const Sidebar = ({ roleId, onLogout }) => {
       </div>
 
       {/* Nút hamburger */}
-      <button
+      {/* <button
         onClick={toggleSidebar}
         className={`sidebar-button ${isOpen ? 'sidebar-button-left' : 'sidebar-button-right'}`}
       >
         <FontAwesomeIcon icon={faBars} />
-      </button>
+      </button> */}
 
 
       <ul className="nav flex-column">

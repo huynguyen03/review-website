@@ -95,7 +95,7 @@ const Users = () => {
   return (
     <SearchProvider> {/* Wrap the content with SearchProvider */}
       <div className="d-flex">
-        <div className="content flex-grow-1 p-3" style={{ marginLeft: "250px" }}>
+        <div className="content flex-grow-1 p-3" style={{ marginLeft: "282px" }}>
           <HeaderContent />
           {renderSection()}
         </div>

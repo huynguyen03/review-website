@@ -66,10 +66,10 @@ const HeaderContent = () => {
   };
 
   return (
-    <div className="flex-grow-1 p-2">
-      <div className="heading-content mb-4 d-flex align-items-center justify-content-between">
+    <div className="flex-grow-1 p-2 m-2 mb-3">
+      <div className="heading-content  d-flex text-center justify-content-between align-items-center">
         {/* Đường dẫn breadcrumb động */}
-        <Breadcrumb>
+        <Breadcrumb className="d-flex align-items-center" style={{marginBottom: "0px"}}>
           <Breadcrumb.Item
             href="/"
             onClick={(e) => {

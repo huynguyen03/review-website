@@ -3,6 +3,8 @@ import { useLocation } from "react-router-dom";
 import { useQuestions } from "./QuestionContext";
 import AddQuestionModal from "./AddQuestionModal"; // Component thêm câu hỏi thủ công
 import CategorySelect from "./CategorySelect"; // Component thêm câu hỏi thủ công
+import UploadFileQuestion from "./UploadFileQuestion"; // Component thêm câu hỏi thủ công
+
 
 import EditQuestion from "./EditQuestion";
 
@@ -16,20 +18,28 @@ const QuestionBank = ({ teacherId }) => {
   const [filteredQuestions, setFilteredQuestions] = useState([]); // Câu hỏi sau khi lọc
   const [categories, setCategories] = useState([]); // Danh sách danh mục
   const [selectedCategory, setSelectedCategory] = useState(""); // Danh mục được chọn
+  const [currentPage, setCurrentPage] = useState(1); // Số trang hiện tại
+  const [questionsPerPage] = useState(10); // Số câu hỏi hiển thị mỗi trang
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
-  console.log("Biến môi trường api là: ", apiUrl)
 
 
   const location = useLocation();
 
-  // Lấy danh sách câu hỏi khi component được mount hoặc khi teacherId thay đổi
-  // useEffect(() => {
-  //   // Chỉ gọi API nếu câu hỏi chưa có trong context
-  //   if (questions.length === 0) {
-  //     fetchQuestions(teacherId); // Lấy câu hỏi từ API
-  //   }
-  // }, [teacherId, questions.length, fetchQuestions]); // Thêm `questions.length` để tránh gọi lại API liên tục
+  const [clickedRowIndex, setClickedRowIndex] = useState(null);
+
+  // Lắng nghe sự kiện click ra ngoài
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (!e.target.closest(".table-cell")) { // Kiểm tra click ngoài ô
+        setClickedRowIndex(null); // Ẩn cuộn khi click ra ngoài
+      }
+    };
+
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, []);
+
 
   useEffect(() => {
     // Kiểm tra nếu đang ở trang question_bank thì gọi API
@@ -50,12 +60,23 @@ const QuestionBank = ({ teacherId }) => {
         // Gọi API lấy danh sách câu hỏi
         const questionRes = await fetch(`${apiUrl}/fetch_questions.php?teacher_id=${teacherId}`);
         const questionData = await questionRes.json();
-        setAllQuestions(questionData);
-        setFilteredQuestions(questionData); // Ban đầu hiển thị toàn bộ câu hỏi
-        console.log("Toàn bộ câu hỏi: ", questionData)
+
+
+        // Lọc và sắp xếp câu hỏi theo ngày cập nhật gần nhất
+        const sortedQuestions = questionData.sort((a, b) => {
+          // Chuyển updated_at thành đối tượng Date để so sánh
+          const dateA = new Date(a.updated_at);
+          const dateB = new Date(b.updated_at);
+
+          // Sắp xếp giảm dần (mới nhất lên đầu)
+          return dateB - dateA;
+        });
+        setAllQuestions(sortedQuestions);
+        setFilteredQuestions(sortedQuestions.slice(0, questionsPerPage)); // Lọc 20 câu hỏi đầu tiên
+        console.log("Toàn bộ câu hỏi: ", sortedQuestions)
 
         // Gọi API lấy danh sách danh mục
-        const categoryRes = await fetch(`${apiUrl}/get_categories.php`);
+        const categoryRes = await fetch(`${apiUrl}/get_categories.php?teacher_id=${teacherId}`);
         const categoryData = await categoryRes.json();
         setCategories(categoryData);
 
@@ -72,9 +93,10 @@ const QuestionBank = ({ teacherId }) => {
   // Khi chọn danh mục, cập nhật danh sách câu hỏi hiển thị
   useEffect(() => {
     if (selectedCategory === "") {
-      setFilteredQuestions(allQuestions); // Nếu không chọn danh mục, hiển thị tất cả
+      setFilteredQuestions(allQuestions.slice(0, questionsPerPage)); // Nếu không chọn danh mục, hiển thị tất cả
     } else {
-      setFilteredQuestions(allQuestions.filter(q => q.category_id === Number(selectedCategory)));
+      const filtered = allQuestions.filter(q => q.category_id === Number(selectedCategory));
+      setFilteredQuestions(filtered.slice(0, questionsPerPage)); // Lọc câu hỏi theo danh mục và phân trang
       console.log("đã nhận được câu hỏi log")
     }
     console.log("Danh mục đã chọn: ", selectedCategory)
@@ -86,7 +108,18 @@ const QuestionBank = ({ teacherId }) => {
       console.log("Dữ liệu đã lọc được", filteredQuestions)
     }
   })
-
+  // Hàm callback để cập nhật danh mục từ component con
+  const updateCategories = async () => {
+    try {
+      // Gọi lại API để lấy danh mục mới sau khi thêm thành công
+      const categoryRes = await fetch(`${apiUrl}/get_categories.php?teacher_id=${teacherId}`);
+      const categoryData = await categoryRes.json();
+      setCategories(categoryData); // Cập nhật lại danh mục mới
+      console.log("Danh mục mới sau khi thêm:", categoryData);
+    } catch (error) {
+      console.error("Lỗi khi tải lại danh mục:", error);
+    }
+  };
   // Xử lý chọn/deselect câu hỏi
   const handleSelectQuestion = (questionId) => {
     setSelectedQuestions((prev) =>
@@ -150,14 +183,42 @@ const QuestionBank = ({ teacherId }) => {
     setEditingQuestionId(selectedQuestions[0]); // Lưu ID câu hỏi cần chỉnh sửa
     setShowEditModal(true); // Mở modal chỉnh sửa
   };
-//Hàm hiển thị danh mục
+  //Hàm hiển thị danh mục
+  // Chuyển trang
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+
+    // Tính toán câu hỏi cần hiển thị cho trang hiện tại
+    const indexOfLastQuestion = pageNumber * questionsPerPage;
+    const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
+    // Nếu có danh mục đã chọn, phân trang câu hỏi của danh mục đó
+    if (selectedCategory === "") {
+      setFilteredQuestions(allQuestions.slice(indexOfFirstQuestion, indexOfLastQuestion)); // Phân trang cho toàn bộ câu hỏi
+    } else {
+      const filtered = allQuestions.filter(q => q.category_id === Number(selectedCategory));
+      setFilteredQuestions(filtered.slice(indexOfFirstQuestion, indexOfLastQuestion)); // Phân trang cho câu hỏi trong danh mục
+    }
+  };
+
+  // Tính toán số trang
+  const pageNumbers = [];
+  const currentQuestions = selectedCategory === ""
+    ? allQuestions
+    : allQuestions.filter(q => q.category_id === Number(selectedCategory));
+
+  for (let i = 1; i <= Math.ceil(currentQuestions.length / questionsPerPage); i++) {
+    pageNumbers.push(i);
+  }
 
 
 
   return (
-    <div className="mt-4">
+
+    <div className="mt-4 container">
+      <UploadFileQuestion teacherId={teacherId} updateCategories={updateCategories} />
+      <div className="content-container">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>Ngân hàng câu hỏi</h4>
+        <h4 className="title">Ngân hàng câu hỏi</h4>
         <button
           className="btn btn-primary"
           onClick={() => setShowAddModal(true)} // Mở modal thêm câu hỏi thủ công
@@ -167,26 +228,28 @@ const QuestionBank = ({ teacherId }) => {
       </div>
       {/* Dropdown chọn danh mục */}
       <div className="mb-3">
-      <label htmlFor="categorySelect">Chọn danh mục:</label>
-      <select
-        id="categorySelect"
-        className="form-control"
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
-      >
-        <option value="">Tất cả</option>
-        {/* Gọi component CategorySelect */}
-        <CategorySelect categories={categories} questions={questions} />
-      </select>
-    </div>
-
+        <label htmlFor="categorySelect">Chọn danh mục:</label>
+        <select
+          id="categorySelect"
+          className="form-control"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+          {/* Chọn danh mục mặc định (danh mục đầu tiên) */}
+          <option value="">
+            Tất cả câu hỏi
+          </option>
+          {/* Gọi component CategorySelect */}
+          <CategorySelect categories={categories} questions={questions} />
+        </select>
+      </div>
 
 
       {filteredQuestions.length > 0 ? (
-        <table className="table table-striped table-responsive table-bordered"  style={{ tableLayout: "fixed", width: "100%"}}>
+        <table className="table table-striped table-responsive table-bordered" style={{ tableLayout: "fixed", width: "100%" }}>
           <thead>
             <tr>
-              <th style={{ width: "2%" }}>
+              <th style={{ width: "3%" }}>
                 <input
                   type="checkbox"
                   onChange={(e) => {
@@ -200,10 +263,10 @@ const QuestionBank = ({ teacherId }) => {
                 />
               </th>
               <th style={{ width: "10%" }}>Loại câu hỏi</th>
-              <th style={{ width: "35%" }}>Nội dung</th>
+              <th style={{ width: "30%" }}>Nội dung</th>
               <th style={{ width: "15%" }}>Các đáp án để lựa chọn</th>
               <th style={{ width: "15%" }}>Đáp án đúng</th>
-              <th style={{ width: "5%" }} class="text-center">Điểm</th>
+              <th style={{ width: "7%" }} class="text-center">Điểm</th>
 
               <th style={{ width: "7%" }} class="text-center">Độ khó</th>
               <th style={{ width: "7%" }} class="text-center">Trạng thái </th>
@@ -211,7 +274,7 @@ const QuestionBank = ({ teacherId }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredQuestions.map((question) => (
+            {filteredQuestions.map((question, index) => (
 
               <tr key={question.question_id}>
                 <td>
@@ -222,15 +285,37 @@ const QuestionBank = ({ teacherId }) => {
                   />
                 </td>
                 <td>{question.question_type}</td>
-                <td>{question.question_text}</td>
+                {/* <td>{question.question_text}</td> */}
                 <td
+                  id={`cell-${index}`} // Thêm ID riêng cho từng ô để xác định ô được click
                   style={{
-                    overflowX: 'auto',
-                    whiteSpace: 'nowrap',
-                    padding: '0',
-                    maxWidth: '100%',
+                    overflowX: clickedRowIndex === index ? "auto" : "hidden", // Hiển thị cuộn khi click vào ô
+                    whiteSpace: "nowrap",
+                    padding: "0",
+                    maxWidth: "100%",
                   }}
-                  onClick={(e) => e.stopPropagation()} // Chặn sự kiện click ra ngoài nếu cần
+                  onClick={(e) => {
+                    e.stopPropagation(); // Ngăn chặn sự kiện lan ra ngoài
+                    setClickedRowIndex(index); // Hiển thị cuộn cho ô được click
+                  }}
+                >
+                  <div className="d-flex">
+                    <span className="mx-2">{question.question_text}</span>
+                  </div>
+                </td>
+                
+                <td
+                  id={`cell-${index}`} // Thêm ID riêng cho từng ô để xác định ô được click
+                  style={{
+                    overflowX: clickedRowIndex === index ? "auto" : "hidden", // Hiển thị cuộn khi click vào ô
+                    whiteSpace: "nowrap",
+                    padding: "0",
+                    maxWidth: "100%",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Ngăn chặn sự kiện lan ra ngoài
+                    setClickedRowIndex(index); // Hiển thị cuộn cho ô được click
+                  }}
                 >
                   <div className="d-flex">
                     {question.answer_options?.map((option, index) => (
@@ -240,8 +325,25 @@ const QuestionBank = ({ teacherId }) => {
                     ))}
                   </div>
                 </td>
+                <td
+                  id={`cell-${index}`} // Thêm ID riêng cho từng ô để xác định ô được click
+                  style={{
+                    overflowX: clickedRowIndex === index ? "auto" : "hidden", // Hiển thị cuộn khi click vào ô
+                    whiteSpace: "nowrap",
+                    padding: "0",
+                    maxWidth: "100%",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Ngăn chặn sự kiện lan ra ngoài
+                    setClickedRowIndex(index); // Hiển thị cuộn cho ô được click
+                  }}
+                >
+                  <div className="d-flex">
+                    <span className="mx-2">{question.correct_answer_index}</span>
+                  </div>
+                </td>
 
-                <td>{question.correct_answer_text}</td>
+                {/* <td>{question.correct_answer_text}</td> */}
                 <td class="text-center">{question.score}</td>
                 <td class="text-center">{question.difficulty_level}</td>
                 <td class="text-center">{question.status}</td>
@@ -253,7 +355,21 @@ const QuestionBank = ({ teacherId }) => {
       ) : (
         <p>Không có câu hỏi nào.</p>
       )}
-
+      {/* Điều hướng phân trang */}
+      <div className="d-flex justify-content-center">
+        <ul className="pagination">
+          {pageNumbers.map((number) => (
+            <li key={number} className={`page-item ${currentPage === number ? "active" : ""}`}>
+              <button
+                onClick={() => paginate(number)}
+                className="page-link"
+              >
+                {number}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
       <button
         className="btn btn-danger mt-3"
         onClick={handleDeleteQuestions}
@@ -300,6 +416,7 @@ const QuestionBank = ({ teacherId }) => {
           setEditingQuestionId(null); // Reset ID sau khi cập nhật
         }}
       />
+      </div>
 
     </div>
 

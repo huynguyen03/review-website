@@ -24,6 +24,8 @@ const HomePage = ({ userId, roleId }) => {
   const [selectedClassroom, setSelectedClassroom] = useState(null); // Chọn lớp học
   const [showClassroom, setShowClassroom] = useState(false); // Vào lớp học
   const { searchQuery } = useSearch(); // Lấy dữ liệu tìm kiếm từ context
+  const [visibleExams, setVisibleExams] = useState(3); // số bài thi hiển thị ban đầu
+  const [visibleClassrooms, setVisibleClassrooms] = useState(3); // số lớp học hiển thị ban đầu
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
   const navigate = useNavigate();
@@ -78,6 +80,13 @@ const HomePage = ({ userId, roleId }) => {
       fetchJoinedClassrooms();
     }
   }, [userId]);
+
+  const handleLoadExamMore = () => {
+    setVisibleExams(prev => prev + 3); // mỗi lần nhấn hiển thị thêm 3 bài
+  };
+  const handleLoadClassroomMore = () => {
+    setVisibleClassrooms(prev => prev + 3); // mỗi lần nhấn hiển thị thêm 3 bài
+  };
 
 
   // Lọc các bài thi dựa trên từ khóa tìm kiếm
@@ -144,7 +153,7 @@ const HomePage = ({ userId, roleId }) => {
           ) : (
             <>
               <Row className="mb-4">
-                {filteredExams.slice(0, 3).map((exam) => (
+                {filteredExams.slice(0, visibleExams).map((exam) => (
                   <Col key={exam.exam_id} md={4} className="mb-3">
                     <Card className="exam-card shadow-lg">
                       <Card.Img variant="top" src={exam.image_url || defaultExamImage} className="card-image" />
@@ -166,11 +175,13 @@ const HomePage = ({ userId, roleId }) => {
                   </Col>
                 ))}
               </Row>
-              <div className="text-center">
-                <Button variant="link" className="text-muted">
-                  <FontAwesomeIcon icon={faArrowDown} /> Xem thêm bài thi
-                </Button>
-              </div>
+              {visibleExams < filteredExams.length && (
+        <div className="text-center">
+          <Button variant="link" className="text-muted" onClick={handleLoadExamMore}>
+            <FontAwesomeIcon icon={faArrowDown} /> Xem thêm bài thi
+          </Button>
+        </div>
+      )}
             </>
           )}
       {/* DANH SÁCH LỚP HỌC CÔNG KHAI */}
@@ -180,7 +191,7 @@ const HomePage = ({ userId, roleId }) => {
       ) : (
         <>
           <Row className="mb-4">
-            {filteredClassrooms.slice(0, 3).map((classroom) => (
+            {filteredClassrooms.slice(0, visibleClassrooms).map((classroom) => (
               <Col key={classroom.classroom_id} md={4} className="mb-3">
                 <Card className="exam-card shadow-lg position-relative">
                   <div
@@ -222,11 +233,13 @@ const HomePage = ({ userId, roleId }) => {
             ))}
           </Row>
 
-          <div className="text-center">
-            <Button variant="link" className="text-muted">
-              <FontAwesomeIcon icon={faArrowDown} /> Xem thêm bài thi
-            </Button>
-          </div>
+          {visibleClassrooms < filteredClassrooms.length && (
+        <div className="text-center">
+          <Button variant="link" className="text-muted" onClick={handleLoadClassroomMore}>
+            <FontAwesomeIcon icon={faArrowDown} /> Xem thêm lớp học
+          </Button>
+        </div>
+      )}
         </>
       )}
         </>

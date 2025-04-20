@@ -5,6 +5,10 @@ import ExamSimulation from "./ExamSimulation";
 import QuizSettings from "./QuizSettings"; 
 import CreateQuiz from "./CreateQuiz"; 
 
+import defaultExamImage from "../assets/images/logo/logo_transparent_blue.png";
+
+import "../assets/styles/ExamCard.css"
+
 const QuizList = ({ userRole, userId }) => {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +42,7 @@ const QuizList = ({ userRole, userId }) => {
   // 🛑 Hàm chọn bài thi khi click "Thi thử"
   const handleSelectExam = (exam) => {
     setSelectedExam(exam);
-    navigate(`/teacher?section=my_quiz&action=exam&id=${exam.exam_id}`);
+    navigate(`/teacher?section=my_quiz&action=exam&exam_id=${exam.exam_id}`);
   };
 
   // 🛑 Hàm xóa bài thi
@@ -70,10 +74,10 @@ const QuizList = ({ userRole, userId }) => {
   };
 
   return (
-    <Container fluid  className="container-full-width">
+    <Container className="container-full-width">
       <Row>
         {/* Nội dung chính */}
-        <Col md={9}>
+        <Col md={12}>
           {loading ? (
             <div className="text-center mt-5">
               <Spinner animation="border" />
@@ -97,9 +101,10 @@ const QuizList = ({ userRole, userId }) => {
               </Alert>
             )
           ) : action === "settings" ? (
-            <QuizSettings userId={userId} examId={queryParams.get("id")} onBack={() => navigate("/teacher?section=my_quiz")} />
+            <QuizSettings userId={userId} examId={queryParams.get("exam_id")} onBack={() => navigate("/teacher?section=my_quiz")} />
           ) : (
             <>
+            <div className="content-container">
               <h2>Bài tập của tôi</h2>
               <Button 
                 variant="primary" 
@@ -109,14 +114,17 @@ const QuizList = ({ userRole, userId }) => {
                 + Tạo bài thi mới
               </Button>
 
-              <Row>
+              <Row className="mb-4">
                 {quizzes.length > 0 ? (
                   quizzes.map((quiz) => (
                     <Col md={4} key={quiz.exam_id} className="mb-3">
-                      <Card>
+                      <Card className="exam-card shadow-lg">
+                        <Card.Img variant="top" src={quiz.image_url || defaultExamImage} className="card-image" />
                         <Card.Body>
-                          <div className="quiz-thumbnail bg-light" style={{ height: "150px" }}></div>
+                        <div class="tag-exam">Bài thi</div>
+                          
                           <Card.Title>{quiz.exam_name}</Card.Title>
+                          <Card.Text>Thời gian làm bài: {quiz.time_limit} phút</Card.Text>
                           <Card.Subtitle className="mb-2 text-muted">
                             Người tạo: {quiz.created_by_name || "Không rõ"}
                           </Card.Subtitle>
@@ -138,7 +146,7 @@ const QuizList = ({ userRole, userId }) => {
                             variant="warning" 
                             size="sm" 
                             className="ms-2"
-                            onClick={() => navigate(`/teacher?section=my_quiz&action=settings&id=${quiz.exam_id}`)}
+                            onClick={() => navigate(`/teacher?section=my_quiz&action=settings&exam_id=${quiz.exam_id}`)}
                           >
                             Tùy chỉnh
                           </Button>
@@ -162,6 +170,7 @@ const QuizList = ({ userRole, userId }) => {
                   <p>Chưa có bài thi nào.</p>
                 )}
               </Row>
+              </div>
             </>
           )}
         </Col>

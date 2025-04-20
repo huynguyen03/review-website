@@ -10,11 +10,13 @@ import defaultClassroomImage from "../assets/images/defaut-classrooms.png";
 
 import defaultAvtteacher from "../assets/images/avatar-defaut-teacher.png";
 import ClassroomPractice from "./ClassroomPractice";
+import LearningProcess from "./LearningProcess";
 
 
 const StudentClassrooms = ({ userId, roleId }) => {
   const [enrolledClassrooms, setEnrolledClassrooms] = useState([]); // Lớp học đã tham gia
   const [selectedClassroom, setSelectedClassroom] = useState(null);//chọn lớp học
+  const [visibleClassrooms, setVisibleClassrooms] = useState(6); // số lớp học hiển thị ban đầu
 
   const [showClassroom, setShowClassroom] = useState(false);//vào lớp học
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
@@ -41,7 +43,9 @@ const StudentClassrooms = ({ userId, roleId }) => {
   }, [userId]);
 
 
-
+  const handleLoadClassroomMore = () => {
+    setVisibleClassrooms(prev => prev + 6); // mỗi lần nhấn hiển thị thêm 3 bài
+  };
   // Vào lớp học (chuyển trang)
   const handleEnterClassroom = (classroom) => {
     console.log("ID lớp truyền", classroom.classroom_id);
@@ -60,7 +64,7 @@ const StudentClassrooms = ({ userId, roleId }) => {
         <>
           <h2 className="title">Lớp học của tôi</h2>
           <Row className="mb-4">
-            {enrolledClassrooms.slice(0, 3).map((classroom) => (
+            {enrolledClassrooms.slice(0, visibleClassrooms).map((classroom) => (
               <Col key={classroom.classroom_id} md={4} className="mb-3">
                 <Card className="exam-card shadow-lg position-relative">
                   <div
@@ -97,12 +101,16 @@ const StudentClassrooms = ({ userId, roleId }) => {
             ))}
           </Row>
 
-          <div className="text-center">
-            <Button variant="link" className="text-muted">
-              <FontAwesomeIcon icon={faArrowDown} /> Xem thêm bài thi
-            </Button>
-          </div>
+          {visibleClassrooms < enrolledClassrooms.length && (
+                  <div className="text-center">
+                    <Button variant="link" className="text-muted" onClick={handleLoadClassroomMore}>
+                      <FontAwesomeIcon icon={faArrowDown} /> Xem thêm lớp học
+                    </Button>
+                  </div>
+                )}
+
         </>
+        
       
     </div>
   )

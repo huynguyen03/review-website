@@ -1,0 +1,55 @@
+.custom-learning-process {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 250px);  /* Giảm chiều rộng đi để dành cho sidebar (giả sử sidebar có chiều rộng 250px) */
+    /* height: 100vh;               Chiếm toàn bộ chiều cao màn hình */
+    overflow: hidden;            /* Ẩn các phần tràn ngoài container */
+    padding: 20px;
+    border: 2px solid #ddd;      /* Viền bao quanh toàn bộ tiến trình học */
+    border-radius: 10px;         /* Làm viền mềm mại */
+    background-color: #f9f9f9;   /* Màu nền nhẹ để tách biệt với phần còn lại */
+  }
+  
+  .custom-exam-wrapper {
+    width: 100%;                /* Chiếm toàn bộ chiều rộng của wrapper */
+    overflow-x: auto;           /* Hiển thị thanh cuộn ngang khi các bài thi vượt quá chiều rộng */
+    overflow-y: hidden;         /* Ẩn thanh cuộn dọc nếu không cần */
+    padding: 5px 0;            /* Khoảng cách cho container */
+    box-sizing: border-box;     /* Đảm bảo padding không làm ảnh hưởng đến tổng chiều rộng */
+    margin-bottom: 5px;        /* Tạo khoảng cách giữa phần bài thi và thông tin tiến trình */
+  }
+  
+  .custom-exam-container {
+    display: inline-flex;       /* Sử dụng inline-flex để đảm bảo các phần tử không bị đẩy ra ngoài màn hình */
+    gap: 12px;                  /* Khoảng cách giữa các bài thi */
+    flex-wrap: nowrap;          /* Đảm bảo các phần tử luôn ở trên 1 hàng ngang */
+  }
+  
+  .custom-exam-item {
+    flex-shrink: 0;             /* Ngăn không cho các bài thi bị thu nhỏ */
+    width: 20%;                 /* Đặt chiều rộng mỗi bài thi */
+    box-sizing: border-box;     /* Đảm bảo phần tử không tràn ra ngoài */
+  }
+  .custom-exam-item {
+    transition: all 0.3s ease;
+  }
+  
+  .custom-exam-item.unlocked {
+    opacity: 1;
+  }
+  
+  .custom-exam-item.locked {
+    opacity: 0.5; /* Làm mờ các bài thi chưa mở khóa */
+  }
+  
+  button:disabled {
+    background-color: #ccc; /* Màu nền của nút khi bị vô hiệu hóa */
+    cursor: not-allowed;    /* Con trỏ không cho phép */
+  }
+  
+  .process-info {
+    border-top: 1px solid #ddd; /* Viền trên cho phần thông tin tiến trình */
+    padding-top: 15px;           /* Khoảng cách trên thông tin tiến trình */
+    margin-top: 20px;            /* Khoảng cách giữa thông tin tiến trình và phần bài thi */
+  }
+  

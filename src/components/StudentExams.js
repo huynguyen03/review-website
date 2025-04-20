@@ -13,6 +13,8 @@ const StudentExams = ({ userId }) => {
   const [currentExam, setCurrentExam] = useState(null);
   const [enrolledExams, setEnrolledExams] = useState([]); // Bài thi đã tham gia
   const [examResults, setExamResults] = useState([]);
+    const [visibleExams, setVisibleExams] = useState(6); // số bài thi hiển thị ban đầu
+  
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
   const navigate = useNavigate();
@@ -50,6 +52,10 @@ const StudentExams = ({ userId }) => {
     }
   }, [userId]);
 
+
+  const handleLoadExamMore = () => {
+    setVisibleExams(prev => prev + 6); // mỗi lần nhấn hiển thị thêm 3 bài
+  };
 
   const handleStartExam = (selectedExam) => {
     // Lưu dữ liệu bài thi vào localStorage
@@ -95,7 +101,7 @@ const StudentExams = ({ userId }) => {
       ) : (
         <>
           <Row className="mb-4">
-            {enrolledExams.slice(0, 3).map((exam) => (
+            {enrolledExams.slice(0, visibleExams).map((exam) => (
               <Col key={exam.exam_id} md={4} className="mb-3">
                 <Card className="exam-card shadow-lg">
                   <Card.Img variant="top" src={exam.image_url || defaultExamImage} className="card-image" />
@@ -131,11 +137,13 @@ const StudentExams = ({ userId }) => {
               </Col>
             ))}
           </Row>
-          <div className="text-center">
-            <Button variant="link" className="text-muted">
-              <FontAwesomeIcon icon={faArrowDown} /> Xem thêm bài thi
-            </Button>
-          </div>
+          {visibleExams < enrolledExams.length && (
+                  <div className="text-center">
+                    <Button variant="link" className="text-muted" onClick={handleLoadExamMore}>
+                      <FontAwesomeIcon icon={faArrowDown} /> Xem thêm bài thi
+                    </Button>
+                  </div>
+                )}
         </>
       )}
     </div>

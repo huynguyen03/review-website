@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { useQuestions } from "./QuestionContext";
 import ModalAddCategory from "./ModalAddCategory";
 
+import "../assets/styles/UploadFileQuestion.css"
 
-const UploadFileQuestion = ({ teacherId }) => {
+
+const UploadFileQuestion = ({ teacherId, updateCategories }) => {
   const [file, setFile] = useState(null);
   const fileInputRef = useRef(null); // Tham chiếu đến input file
   const { fetchQuestions } = useQuestions(); // Lấy hàm fetchQuestions từ context
@@ -21,7 +23,7 @@ const UploadFileQuestion = ({ teacherId }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${apiUrl}/get_categories.php`);
+      const response = await fetch(`${apiUrl}/get_categories.php?teacher_id=${teacherId}`);
       const data = await response.json();
       setCategories(data); // Cập nhật danh mục
     } catch (error) {
@@ -106,6 +108,7 @@ const UploadFileQuestion = ({ teacherId }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          user_id: teacherId,
           category_name: newCategory.category_name,  // Gửi tên danh mục
           parent_id: newCategory.parent_id || null,  // Nếu không có danh mục cha, gửi null
         }),
@@ -115,6 +118,12 @@ const UploadFileQuestion = ({ teacherId }) => {
   
       if (result.status === "success") {
         alert(result.message);
+        console.log("Kiểm tra kiểu của updateCategories: ",typeof updateCategories);
+        
+        if (typeof updateCategories === "function") {
+          updateCategories(); // Gọi hàm updateCategories để tải lại danh mục
+          
+        } 
         setShowModal(false); // Đóng modal
         fetchCategories(); // Cập nhật danh sách danh mục
       } else {
@@ -128,26 +137,39 @@ const UploadFileQuestion = ({ teacherId }) => {
   
 
   return (
-    <div className="container mt-2" style={{ maxWidth: "100%" }}>
-      <h3>Tải tệp câu hỏi lên hệ thống</h3>
-      <div className="mb-3 d-flex align-items-center">
+    <div className="content-container">
+      <h3 className="title">Tải tệp câu hỏi lên hệ thống</h3>
+    <div className="mt-2 question-upload-container">
+      <div className="mb-3 d-flex align-items-center ">
         {/* Dropdown danh mục */}
         <select
-          className="form-select me-3"
+          className="form-select me-3 question-category-select"
           value={selectedCategory}
           onChange={handleCategoryChange}
         >
-          <option value="">Chọn danh mục</option>
-          {categories.map((category) => (
-            <option key={category.category_id} value={category.category_id}>
-              {category.category_name}
-            </option>
-          ))}
+          {/* Chọn danh mục mặc định là danh mục đầu tiên */}
+  {categories.length > 0 && (
+    <option value={categories[0].category_id}>{categories[0].category_name}</option>
+  )}
+
+  {/* Hiển thị các danh mục còn lại */}
+  {categories.slice(1).map((category) => (
+    <option key={category.category_id} value={category.category_id}>
+      {category.category_name}
+    </option>
+  ))}
         </select>
         {/* Nút thêm danh mục */}
-        <button className="btn btn-outline-primary" onClick={() => setShowModal(true)}>
+        <button className="btn btn-outline-primary question-category-buttons" onClick={() => setShowModal(true)}>
           +
         </button>
+        {/* Nút gỡ danh mục */}
+    <button
+      className="btn btn-outline-danger question-category-buttons"
+      onClick={() => setSelectedCategory("")} // Gỡ danh mục khi nhấn nút "-"
+    >
+      -
+    </button>
       </div>
 
       {/* Hiển thị Modal */}
@@ -161,7 +183,7 @@ const UploadFileQuestion = ({ teacherId }) => {
       {/* Input file */}
       <input
         type="file"
-        className="form-control mb-3"
+        className="form-control mb-3 question-file-input"
         accept=".csv,.txt,.gift"
         onChange={handleFileChange}
         disabled={loading}
@@ -173,6 +195,8 @@ const UploadFileQuestion = ({ teacherId }) => {
         {loading ? "Đang tải lên..." : "Tải lên"}
       </button>
     </div>
+    </div>
+
   );
 };
 

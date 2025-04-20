@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import ClassroomPractice from "./ClassroomPractice"
+import defaultClassroomImage from "../assets/images/defaut-classrooms.png";
+import defaultAvtteacher from "../assets/images/avatar-defaut-teacher.png";
+
 
 const ManageClassrooms = ({ teacherId, roleId }) => {
   const [classrooms, setClassrooms] = useState([]);
@@ -44,12 +47,12 @@ const ManageClassrooms = ({ teacherId, roleId }) => {
     }
   };
 
-const handleEnterClassroom = (classroom) => {
-  console.log("ID lớp truyền", classroom.classroom_id)
-  setSelectedClassroom(classroom);
-  setShowClassroom(true);
-  setShowDetails(false)
-}
+  const handleEnterClassroom = (classroom) => {
+    console.log("ID lớp truyền", classroom.classroom_id)
+    setSelectedClassroom(classroom);
+    setShowClassroom(true);
+    setShowDetails(false)
+  }
 
   // ✅ Xử lý chọn lớp học
   const handleManageClassroom = (classroom) => {
@@ -87,31 +90,31 @@ const handleEnterClassroom = (classroom) => {
   };
 
   // ✅ Xử lý tạo lớp học
-const handleCreateClass = async () => {
-  // Kiểm tra dữ liệu đầu vào
-  if (!className || !teacherId) {
-    alert("Vui lòng nhập đầy đủ tên lớp học và mã giảng viên.");
-    return;
-  }
+  const handleCreateClass = async () => {
+    // Kiểm tra dữ liệu đầu vào
+    if (!className || !teacherId) {
+      alert("Vui lòng nhập đầy đủ tên lớp học và mã giảng viên.");
+      return;
+    }
 
-  try {
-    // Gửi yêu cầu tạo lớp học
-    const response = await axios.post(`${apiUrl}/create_classroom.php`, {
-      class_name: className,
-      teacher_id: teacherId,
-    });
+    try {
+      // Gửi yêu cầu tạo lớp học
+      const response = await axios.post(`${apiUrl}/create_classroom.php`, {
+        class_name: className,
+        teacher_id: teacherId,
+      });
 
-    const newClassroom = response.data;
+      const newClassroom = response.data;
 
-    // Cập nhật danh sách lớp học
-    setClassrooms((prev) => [...prev, newClassroom]);
+      // Cập nhật danh sách lớp học
+      setClassrooms((prev) => [...prev, newClassroom]);
 
-    setClassName(""); // Reset lại tên lớp
-    alert("✅ Lớp học đã được tạo thành công!");
-  } catch (error) {
-    console.error("❌ Lỗi tạo lớp học:", error);
-  }
-};
+      setClassName(""); // Reset lại tên lớp
+      alert("✅ Lớp học đã được tạo thành công!");
+    } catch (error) {
+      console.error("❌ Lỗi tạo lớp học:", error);
+    }
+  };
 
   // ✅ Xử lý xóa thành viên
   const handleKickMember = async (studentId) => {
@@ -135,44 +138,71 @@ const handleCreateClass = async () => {
   };
 
   return (
-    <div >
-      
+    <div className="">
+
 
 
       {/* Danh sách lớp học */}
-      {!showDetails && !showClassroom &&(
+      {!showDetails && !showClassroom && (
         <div>
-          <h2>Quản lý lớp học</h2>
-          <Button variant="primary" className="mb-3" onClick={() => setShowModal(true)}>
-            + Tạo lớp học mới
-          </Button>
+          <div className="content-container">
+            <h2>Quản lý lớp học</h2>
+            <Button variant="primary" className="mb-3" onClick={() => setShowModal(true)}>
+              + Tạo lớp học mới
+            </Button>
+          </div>
+          <div className="content-container">
 
-          <Row>
+          <h2 className="title">Lớp học của tôi</h2>
+          <Row className="mb-4">
             {classrooms.map((classroom) => (
               <Col key={classroom.classroom_id} md={4} className="mb-3">
                 <Card style={{ cursor: "pointer" }}>
+                  <div
+                    className="card-image">
+
+                    <Card.Img
+                      className="card-classroom-img-top"
+                      variant="top"
+                      src={classroom.image_url || defaultClassroomImage}
+                    />
+                  </div>
+                  <img
+                    src={classroom.teacher_image_url || defaultAvtteacher}
+
+                    alt="Teacher Avatar"
+                    className="teacher-avatar position-absolute"
+                  />
+
                   <Card.Body>
+                    <div class="tag-classroom">Lớp học</div>
                     <Card.Title>{classroom.class_name}</Card.Title>
                     <Card.Subtitle className="mb-2 text-muted">
                       Giáo viên: {classroom.teacher_name}
                     </Card.Subtitle>
                     <Card.Text>Ngày tạo: {new Date(classroom.created_at).toLocaleString()}</Card.Text>
-                    <Button variant="primary" onClick={() => {handleEnterClassroom(classroom); navigate(`/teacher?section=manage_classrooms&sub=classroom`)}}>
-                          Vào Lớp học
-                      </Button>
-                    <Button variant="warning" onClick={() => handleManageClassroom(classroom)}>
+                    <Card.Text className="text-muted">Số thành viên: {classroom.members_count}</Card.Text>
+                      <div className="w-100">
+
+                    <Button className="w-100 mb-2" variant="primary" onClick={() => { handleEnterClassroom(classroom); navigate(`/teacher?section=manage_classrooms&sub=classroom`) }}>
+                      Vào Lớp học
+                    </Button>
+                    <Button className="w-100 " variant="warning" onClick={() => handleManageClassroom(classroom)}>
                       Quản lý thành viên & Chỉnh sửa lớp
                     </Button>
+                      </div>
                   </Card.Body>
                 </Card>
               </Col>
             ))}
           </Row>
         </div>
+
+        </div>
       )}
-{/* Hiển thị ClassroomPractice nếu showClassroomPractice là true */}
-{showClassroom && <ClassroomPractice classroomId={selectedClassroom.classroom_id} userId={teacherId} roleId={roleId}/>}
-    
+      {/* Hiển thị ClassroomPractice nếu showClassroomPractice là true */}
+      {showClassroom && <ClassroomPractice classroomId={selectedClassroom.classroom_id} userId={teacherId} roleId={roleId} />}
+
       {/* Chi tiết lớp học */}
       {showDetails && selectedClassroom && (
         <div className="mt-4">

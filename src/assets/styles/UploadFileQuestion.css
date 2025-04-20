@@ -1,0 +1,40 @@
+/* Đảm bảo rằng các phần tử không bị ghi đè */
+.question-upload-container {
+    max-width: 100%;
+
+  }
+  
+  /* Giảm độ dài của ô chọn danh mục (50%) */
+  .question-category-select {
+    max-width: 50%; /* Giảm chiều rộng của select */
+  }
+  
+  /* Nút "+" và "-" bên cạnh ô chọn danh mục */
+  .question-category-buttons {
+    margin-left: 10px;
+  }
+  
+  .question-category-buttons .btn {
+    margin-right: 10px;
+  }
+  
+  /* Ô tải tệp */
+  .question-file-input {
+    max-width: 50%; /* Giảm độ dài ô tải tệp */
+  }
+  
+  /* Nút tải lên nằm cùng hàng với ô tải tệp */
+  .question-upload-actions {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .question-upload-actions .btn {
+    margin-left: 10px; /* Khoảng cách giữa ô tải tệp và nút tải lên */
+  }
+  
+  .question-upload-actions .btn-primary {
+    margin-left: 10px; /* Khoảng cách cho nút tải lên */
+  }
+  

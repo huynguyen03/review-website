@@ -6,6 +6,7 @@ const Header = ({ user, onLogout, onAuthClick }) => {
   const [scrolling, setScrolling] = useState(false);
   const [showHeader, setShowHeader] = useState(true);
   const [bgColor, setBgColor] = useState("transparent");
+  const [lastScrollY, setLastScrollY] = useState(0); // Lưu vị trí cuộn trước đó
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,17 +21,22 @@ const Header = ({ user, onLogout, onAuthClick }) => {
         setBgColor("transparent"); // Nền trong suốt khi ở đầu trang
       }
 
-      // Điều chỉnh sự xuất hiện của header khi cuộn lên hoặc cuộn xuống
-      if (scrollPosition > 100) {
-        setShowHeader(false); // Ẩn header khi cuộn xuống
+      // Ẩn header khi cuộn xuống, hiển thị khi cuộn lên
+      if (scrollPosition > lastScrollY) {
+        // Cuộn xuống: Ẩn header
+        setShowHeader(false);
       } else {
-        setShowHeader(true); // Hiển thị header khi cuộn lên
+        // Cuộn lên: Hiển thị header
+        setShowHeader(true);
       }
+
+      // Cập nhật vị trí cuộn
+      setLastScrollY(scrollPosition);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   return (
     <header 

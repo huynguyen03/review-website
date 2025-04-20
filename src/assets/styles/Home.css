@@ -21,7 +21,29 @@
   .banner-item {
     flex: 0 0 100%; /* Mỗi banner chiếm 100% chiều rộng */
     height: 100%; /* Chiều cao của banner */
+    position: relative; /* Để có thể thêm lớp phủ */
   }
+  /* Lớp phủ tối dần cho tất cả các banner */
+.banner-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to top, 
+    rgba(0, 0, 0, 0.8) 20%,   /* Tối dần từ dưới */
+    rgba(0, 0, 0, 0) 40%,    /* Giữ trong suốt từ 10% tới 90% */
+    rgba(0, 0, 0, 0) 80%,    /* Giữ trong suốt từ 10% tới 90% */
+    rgba(0, 0, 0, 0.8) 100%  /* Tối dần từ trên */
+  );
+  z-index: 1;
+}
+
+.banner-item img {
+  z-index: 0; /* Đảm bảo ảnh nằm dưới lớp phủ */
+}
   /* Các banner nhỏ dưới màn hình */
   .small-banners {
     display: flex;
@@ -80,7 +102,7 @@
   }
   
   .card-body {
-    display: flex;
+    /* display: flex; */
     height: 100%;
   }
   

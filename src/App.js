@@ -18,7 +18,7 @@ function Main({ user, setUser, showAuthForm, setShowAuthForm, handleLogin, handl
   useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user)); // Lưu thông tin người dùng
-    }
+    } 
     localStorage.setItem("lastPath", location.pathname); // Lưu đường dẫn hiện tại
 
     // Kiểm tra nếu vào /fill-info thì đóng modal
@@ -26,25 +26,46 @@ function Main({ user, setUser, showAuthForm, setShowAuthForm, handleLogin, handl
       setShowAuthForm(false);
     }
   }, [user, location.pathname, setShowAuthForm]);
+  const handleAuthClick = () => {
+    setShowAuthForm(true); // Hiển thị form đăng nhập
+  };
+
 
   return (
     <>
-      {/* Chỉ hiển thị Header nếu không có user */}
-      {!user && (
-        <Header
-          user={user}
-          onLogout={handleLogout}
-          onAuthClick={() => setShowAuthForm(true)} // Hiển thị AuthForm khi nhấn
-        />
-      )}
-      {user && <Sidebar roleId={user.role_id} onLogout={handleLogout}/>}
+
+    {/* Chỉ hiển thị Header nếu không có user */}
+    {(!user || location.pathname === '/') && (
+      
+    <Header
+      user={user}
+      onLogout={handleLogout}
+      onAuthClick={handleAuthClick} // Hiển thị AuthForm khi nhấn
+    />
+  
+    )}
+
+
+      {(user?.role_id && location.pathname !== '/') && (<Sidebar roleId={user.role_id} onLogout={handleLogout}/>)}
 
       {/* Các Routes */}
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={
+          <Home 
+          onAuthClick={handleAuthClick} // Hiển thị AuthForm khi nhấn
+
+          />} />
+          <Route path="/home" element={<Home onAuthClick={handleAuthClick} />} />
         <Route path="/users" element={user?.role_id === "2" ? <Users /> : <Navigate to="/" />} />
         <Route path="/teacher" element={user?.role_id === "1" ? <Teacher /> : <Navigate to="/" />} />
-        <Route path="/fill-info" element={<FillInfoComponent />} />
+            
+        <Route path="/fill-info" 
+        element={user ? 
+        <FillInfoComponent 
+            user={user}
+            onLogin={handleLogin} // Xử lý đăng nhập
+
+        /> : <Navigate to="/" />} />
       </Routes>
 
       {/* Hiển thị AuthForm */}
@@ -83,6 +104,7 @@ function App() {
     }
 
     if (lastPath && lastPath !== window.location.pathname) {
+    
       window.history.replaceState(null, null, lastPath); // Chuyển đến trang cuối cùng
     }
 

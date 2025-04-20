@@ -17,7 +17,7 @@ import ReviewCardIcon from '../assets/images/onluyen-icon.png';
 
 import "../assets/styles/Home.css";
 
-const Home = () => {
+const Home = ({onAuthClick}) => {
   const [currentBanner, setCurrentBanner] = useState(0);
   const banners = [
     banner1,
@@ -118,7 +118,7 @@ const Home = () => {
                   <Card.Text> Câu hỏi được sàn lọc kỹ theo từng mức độ nhằm đánh giá đúng trình độ của mỗi học sinh tham gia. </Card.Text>
                   <Card.Title className='custom-card-title-content'>Bài thi bám sát đề thi THPT quốc gia</Card.Title>
                   <Card.Text> Ma trận và câu hỏi được lựa chọn bám sát theo đề thi THPY quốc gia mới định hướng rèn làm quen với đề thi. </Card.Text>
-                  <Button variant="primary">Xem chi tiết</Button>
+                  <Button variant="primary" onClick={onAuthClick}>Xem chi tiết</Button>
                 </div>
               </Card.Body>
             </Card>
@@ -142,7 +142,7 @@ const Home = () => {
                   <Card.Text> Cài bài ôn luyện được liên kết với nhau với mức đọ từ dể đến khó. Người học có thể dể dàng tiếp cần mới nhiều mức độ câu hỏi khác nhau </Card.Text>
                   <Card.Title className='custom-card-title-content'>Thống kê sau ôn luyện</Card.Title>
                   <Card.Text> Quá trình ôn luyện sẽ đước thông kê chi tiết. Từ điểm số, tỷ lệ trả lời đúng theo mức độ, ma trận đề đều được thể hiện một cách trực quan</Card.Text>
-                  <Button variant="primary">Xem chi tiết</Button>
+                  <Button variant="primary " onClick={onAuthClick}>Xem chi tiết</Button>
                 </div>
               </Card.Body>
             </Card>
@@ -166,7 +166,7 @@ const Home = () => {
                   <Card.Text> Điểm số của mỗi học sinh trong lớp học được quản lý chặc chẻ. Hoàn toàn có thể chấm điểm trực hoặc xuất file điểm nhanh chóng. </Card.Text>
                   <Card.Title className='custom-card-title-content'>Đảm bảo tính riêng tư</Card.Title>
                   <Card.Text> Các bải thi, tiến trình ôn luyện trong lớp chỉ hiển thị tỏng lớp học của giáo viên.</Card.Text>
-                  <Button variant="primary">Xem chi tiết</Button>
+                  <Button variant="primary" onClick={onAuthClick}>Xem chi tiết</Button>
                 </div>
               </Card.Body>
             </Card>

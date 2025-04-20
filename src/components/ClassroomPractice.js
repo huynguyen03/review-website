@@ -5,11 +5,13 @@ import { Button, Card, Row, Col, Modal, Form, Spinner } from "react-bootstrap";
 import axios from "axios";
 import defaultExamImage from "../assets/images/logo/logo_transparent_blue.png";
 
+import LearningProcessStudent from "./LearningProcessStudent";
 import LearningProcess from "./LearningProcess";
+
 
 import ExamStatistics from "./ExamStatistics";
 
-
+import "../assets/styles/ExamCard.css"
 
 const ClassroomPractice = ({ classroomId, userId, roleId }) => {
   const [publicExams, setPublicExams] = useState([]); // Danh sách bài thi đã tạo
@@ -146,34 +148,40 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
           {
             roleId === "2" ? (
               <>
-                <h4>Bài thi của lớp học</h4>
-                <Row>
+                <h4 className="title">Bài thi của lớp học</h4>
+                <Row className="mb-4">
                   {examsClassrom.length > 0 ? (
                     examsClassrom.map((exam) => (
-                      
+
                       <Col key={exam.exam_id} md={4} className="mb-3">
-                                          <Card className="exam-card shadow-lg">
-                                            <Card.Img variant="top" src={exam.image_url || defaultExamImage} className="card-image" />
-                                            <Card.Body>
-                                              <Card.Title>{exam.exam_name}</Card.Title>
-                                              <Card.Text>Thời gian làm bài: {exam.time_limit} phút</Card.Text>
-                      
-                                              <div className="d-flex justify-content-between">
-                                                <div className="rating">
-                                                  <span className="text-warning">{`★ ${exam.rating}`}</span>
-                                                </div>
-                                                  
-                                                <Button variant="primary" onClick={() => { setSelectedExam(exam); handleStartExam(exam) }}>
-                                                  Vào thi
-                                                </Button>
-                                              </div>
-                                            </Card.Body>
-                                          </Card>
-                                        </Col>
+                        <Card className="exam-card shadow-lg">
+                          <Card.Img variant="top" src={exam.image_url || defaultExamImage} className="card-image" />
+                          <Card.Body>
+                            <div class="tag-exam">Bài thi</div>
+
+                            <Card.Title>{exam.exam_name}</Card.Title>
+                            <Card.Text>Thời gian làm bài: {exam.time_limit} phút</Card.Text>
+
+                            <div className="d-flex justify-content-between">
+                              <div className="rating">
+                                <span className="text-warning">{`★ ${exam.rating}`}</span>
+                              </div>
+
+                              <Button variant="primary" onClick={() => { setSelectedExam(exam); handleStartExam(exam) }}>
+                                Vào thi
+                              </Button>
+                            </div>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+
                     ))
                   ) : (
                     <p>📢 Chưa có bài thi nào được thêm vào lớp học.</p>
                   )}
+
+
+                  <LearningProcessStudent classroomId={classroomId} userId={userId} roleId={roleId} />
                 </Row>
 
               </>
@@ -182,23 +190,25 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
               <div style={{ marfin_bottom: "32px" }}>
 
                 {/* Hiển thị các bài thi đã thêm vào lớp học */}
-                <h3 className='h3-header '>Thêm bài thi vào lớp học</h3>
+                <h3 className='h3-header title'>Thêm bài thi vào lớp học</h3>
                 <div className='d-flex gap-2 '>
                   <h4>Bài thi đã thêm vào lớp học</h4>
                   <Button variant="secondary" className="mb-3" onClick={() => setShowExamModal(true)}>
                     + Thêm bài thi đã tạo
                   </Button>
                 </div>
-                <Row>
+                <Row className="mb-4">
                   {examsClassrom.length > 0 ? (
                     examsClassrom.map((exam) => (
                       <Col key={exam.exam_id} md={3} className="mb-3">
-                        <Card>
+                        <Card className="exam-card shadow-lg">
+                          <Card.Img variant="top" src={exam.image_url || defaultExamImage} className="card-image" />
                           <Card.Body>
-                            <Card.Img variant="top" src={exam.image_url || defaultExamImage} className="card-image" />
+                            <div class="tag-exam">Bài thi</div>
+
 
                             <Card.Title>{exam.exam_name}</Card.Title>
-                            <div className="d-flex justify-content-between">
+                            <div className="d-flex justify-content-between flex-column">
 
                               <Button className="px-3" variant="primary" onClick={() => hanldeShowExamStatistics(exam)}>📊 Thống kê điểm số</Button>
                               <Button
@@ -219,7 +229,7 @@ const ClassroomPractice = ({ classroomId, userId, roleId }) => {
 
                 {/* Hiển thị LearningProcess khi showLearningProcess là true */}
 
-                <LearningProcess userId={userId} />
+                {/* <LearningProcess userId={userId} roleId={roleId}/> */}
 
 
                 {/* Modal thêm bài thi đã tạo */}

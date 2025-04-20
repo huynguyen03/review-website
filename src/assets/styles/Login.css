@@ -1,0 +1,42 @@
+  /* Trong file CSS của bạn (ví dụ: App.css hoặc một file CSS riêng) */
+  .google-login-btn {
+    height: 50px; /* Thay đổi chiều cao */
+    font-size: 16px; /* Thay đổi kích thước font chữ */
+  }
+  
+/* Tạo lớp CSS cho nút Google Login để cụ thể hơn */
+.google-login-btn .google-login-button {
+    display: flex;
+    align-items: center;
+    background-color: #4285F4 !important; /* Màu nền Google */
+    color: white !important;
+    border: none !important;
+    border-radius: 5px !important;
+    padding: 10px 20px !important;
+    font-size: 16px !important;
+    cursor: pointer;
+    width: 100% !important;  /* Đảm bảo độ rộng */
+    transition: background-color 0.3s ease !important;
+    border: solid 1px black !important;
+  }
+  
+  /* Hiệu ứng hover */
+  .google-login-btn .google-login-button:hover {
+    background-color: #ccc !important; 
+  }
+  
+  /* Đảm bảo logo Google đúng kích thước */
+.google-login-btn .google-login-button .google-logo {
+    width: 20px !important;
+    height: 20px !important;
+    margin-right: 10px !important;
+  }
+  
+  
+  
+  /* Điều chỉnh cho các lớp Bootstrap bị ghi đè */
+  .google-login-btn .google-login-button {
+    background-color: white !important; /* Đảm bảo không bị Bootstrap ghi đè */
+    color: black !important;
+  }
+  

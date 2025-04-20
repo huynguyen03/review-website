@@ -18,7 +18,7 @@ const ExamSimulation = ({ exam, userRole, onBack, userId, examid }) => {
   const [showReviewPage, setShowReviewPage] = useState(false);
   const [finalScore, setFinalScore] = useState(null); // Được sử dụng trong ScoreCalculator
   const [currentPage, setCurrentPage] = useState(1); // Trạng thái cho trang hiện tại
-  const QUESTIONS_PER_PAGE = 2;  // Giới hạn số câu hỏi mỗi trang
+  const QUESTIONS_PER_PAGE = 1;  // Giới hạn số câu hỏi mỗi trang
   const [analysis, setAnalysis] = useState(null); // 🔹 Thêm state để lưu analysis từ ScoreCalculator
   const [isRandomExam, setIsRandomExam] = useState(false) // Trạng thái bài thi câu hỏi ngẫu nhiên
   const [isScoreCalculated, setIsScoreCalculated] = useState(false); // 🔹 Thêm state kiểm soát tính điểm
@@ -144,12 +144,13 @@ const ExamSimulation = ({ exam, userRole, onBack, userId, examid }) => {
     console.log("Kiểm tra random xóa", isRandomExam)
     const storedIsRandomExam = (localStorage.getItem('isRandomExam'));
     console.log("Kiểm tra random trước khi xóa local", storedIsRandomExam);
-    if (!storedIsRandomExam) {
+    if (!storedIsRandomExam || !isRandomExam) {
       console.log("isRandom is false, not proceeding with deletion.");
       return; // Nếu isRandom là false, thoát hàm
     }
 
     try {
+
       const response = await fetch(`${apiUrl}/delete_cloned_questions.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
